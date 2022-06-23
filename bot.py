@@ -88,6 +88,9 @@ class Bot(metaclass=ABCMeta):
         elif amount > 0:
             data['position'] = 'Long'
             data['amount'] = amount
+        else:
+            data['position'] = None
+            data['amount'] = 0
         data['using'] = float(record['positionInitialMargin'])
         data['entry'] = float(record['entryPrice'])
 
@@ -170,7 +173,7 @@ class Bot(metaclass=ABCMeta):
                 if data['position'] is not None:
                     using_usdt = 0
 
-                    if data['position'] is 'Long':
+                    if data['position'] == 'Long':
                         # 물타기 체크
                         if candle['open'] < candle['bb_l'] < candle['close']:
                             using_usdt += self.balance['total'] * self.added_amount_per
@@ -282,7 +285,7 @@ class Bot(metaclass=ABCMeta):
                 if data['position'] is not None:
                     using_usdt = 0
 
-                    if data['position'] is 'Long':
+                    if data['position'] == 'Long':
                         # 물타기 체크
                         if candle['open'] < candle['bb_l'] < candle['close']:
                             using_usdt += self.balance['total'] * self.added_amount_per
