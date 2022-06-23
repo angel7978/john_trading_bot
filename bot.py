@@ -253,7 +253,7 @@ class Bot(metaclass=ABCMeta):
 
                     elif candle['close'] > candle['bb_h']:
                         price = candle['close'] - data['quote']
-                        ret = self.buyOrder(data, using_usdt / price)
+                        ret = self.sellOrder(data, using_usdt / price)
 
                         print('%s [%s] Short Entry - size : (%.4f USDT)' % (candle['date'], data['symbol'], using_usdt * self.leverage))
                         self.telegram.sendTelegramPush(self.title, '%s [%s]' % (candle['date'], data['symbol']), 'Short 진입 - size : (%.4f USDT)' % (using_usdt * self.leverage))
