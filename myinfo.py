@@ -57,19 +57,24 @@ class MyInfo:
     def getPosition(self, symbol):
         ret = self.exchange.fetch_balance()
 
-        print(ret['info']['positions'])
+        #  print(ret['info']['positions'])
         df = pd.DataFrame(data=ret['info']['positions'], columns=['symbol', 'initialMargin', 'maintMargin', 'unrealizedProfit', 'positionInitialMargin', 'openOrderInitialMargin', 'leverage', 'isolated', 'entryPrice', 'maxNotional', 'positionSide', 'positionAmt', 'notional', 'isolatedWallet', 'bidNotional', 'askNotional'])
         pd.set_option('display.max_columns', None)
-        print(df.query('symbol == "' + symbol + '"'))
+        return df.query('symbol == "' + symbol + '"')
+
+    def getOrder(self, order_id, symbol):
+        return self.exchange.fetch_order(order_id, symbol)
 
     def buyOrder(self, symbol, amount):
         ret = self.exchange.create_market_buy_order(symbol, amount * self.leverage)
         print(ret)
+        return ret
 
     def sellOrder(self, symbol, amount):
         ret = self.exchange.create_market_sell_order(symbol, amount * self.leverage)
         print(ret)
         # {'info': {'orderId': '21869924860', 'symbol': 'XRPUSDT', 'status': 'FILLED', 'clientOrderId': 'x-xcKtGhcud7d3dd4a62d03a19f60198', 'price': '0', 'avgPrice': '0.40700', 'origQty': '30', 'executedQty': '30', 'cumQty': '30', 'cumQuote': '12.21000', 'timeInForce': 'GTC', 'type': 'MARKET', 'reduceOnly': False, 'closePosition': False, 'side': 'SELL', 'positionSide': 'BOTH', 'stopPrice': '0', 'workingType': 'CONTRACT_PRICE', 'priceProtect': False, 'origType': 'MARKET', 'updateTime': '1654841602905'}, 'id': '21869924860', 'clientOrderId': 'x-xcKtGhcud7d3dd4a62d03a19f60198', 'timestamp': None, 'datetime': None, 'lastTradeTimestamp': None, 'symbol': 'XRP/USDT', 'type': 'market', 'timeInForce': 'GTC', 'postOnly': False, 'reduceOnly': False, 'side': 'sell', 'price': 0.407, 'stopPrice': None, 'amount': 30.0, 'cost': 12.21, 'average': 0.407, 'filled': 30.0, 'remaining': 0.0, 'status': 'closed', 'fee': None, 'trades': [], 'fees': []}
+        return ret
 
 
 '''
@@ -107,4 +112,8 @@ class MyInfo:
 6       391.06289886  0.00000000     391.06289886  
 7         0.00000000  0.00000000       0.00000000  
 8         0.00000000  0.00000000       0.00000000  
-9         0.00000000  0.00000000       0.00000000  '''
+9         0.00000000  0.00000000       0.00000000  
+
+{'info': {'orderId': '59486857627', 'symbol': 'BTCUSDT', 'status': 'FILLED', 'clientOrderId': 'x-xcKtGhcudb6cb82cce95137a095704', 'price': '0', 'avgPrice': '20333.60000', 'origQty': '0.020', 'executedQty': '0.020', 'cumQty': '0.020', 'cumQuote': '406.67200', 'timeInForce': 'GTC', 'type': 'MARKET', 'reduceOnly': False, 'closePosition': False, 'side': 'SELL', 'positionSide': 'BOTH', 'stopPrice': '0', 'workingType': 'CONTRACT_PRICE', 'priceProtect': False, 'origType': 'MARKET', 'updateTime': '1655960127298'}, 'id': '59486857627', 'clientOrderId': 'x-xcKtGhcudb6cb82cce95137a095704', 'timestamp': None, 'datetime': None, 'lastTradeTimestamp': None, 'symbol': 'BTC/USDT', 'type': 'market', 'timeInForce': 'GTC', 'postOnly': False, 'reduceOnly': False, 'side': 'sell', 'price': 20333.6, 'stopPrice': None, 'amount': 0.02, 'cost': 406.672, 'average': 20333.6, 'filled': 0.02, 'remaining': 0.0, 'status': 'closed', 'fee': None, 'trades': [], 'fees': []}
+
+'''

@@ -8,4 +8,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-bot.Bot(config_file_name).simulate(48*10)
+#  bot.Bot(config_file_name).simulate(48*14)
+bot.Bot(config_file_name).start()
