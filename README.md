@@ -1,18 +1,25 @@
 # john_trading_bot
 
+
 바이낸스 api 발급
 - Enable Reading, Enable Spot & Margin Trading, Enable Futures 체크
+
 
 config 파일 설정
 - config_example.json => config.json 으로 변경 후 내용 채워 넣기
 
+
 python 3.7 이상 구동
->> python main.py config.json
+> python main.py config.json
+
 
 모듈 설치
->> pip install ccxt
->> pip install ta
->> pip install matplotlib
+> pip install ccxt
+
+> pip install ta
+
+> pip install matplotlib
+
 
 텔레그램 push 받고 싶을 경우
 - @arbitrage_johnpak_bot 찾아서 start 후
