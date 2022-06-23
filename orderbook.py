@@ -18,7 +18,7 @@ class OrderBook:
             'defaultType': 'future'
         }})
 
-    def generate_chart_data(self, symbol, limit=20):
+    def generate_chart_data(self, symbol, limit=25):
         btc = self.exchange.fetch_ohlcv(
             symbol=symbol,
             timeframe='30m',
