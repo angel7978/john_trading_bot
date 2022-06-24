@@ -7,6 +7,7 @@ import orderbook
 import time
 import datetime
 import pandas as pd
+import sys
 
 from abc import *
 
@@ -62,11 +63,11 @@ class Bot(metaclass=ABCMeta):
         }'''
     leverage = 5
 
-    def __init__(self, config_file_name):
-        self.info = myinfo.MyInfo(config_file_name, list(map(lambda data: data['symbol'], self.positions_data)),
+    def __init__(self, file_name):
+        self.info = myinfo.MyInfo(file_name, list(map(lambda data: data['symbol'], self.positions_data)),
                                   self.leverage)
         self.book = orderbook.OrderBook()
-        self.telegram = telegram_module.Telegram(config_file_name)
+        self.telegram = telegram_module.Telegram(file_name)
 
         self.entry_amount_per = 0.2 / len(self.positions_data)
         self.added_amount_per = 0.05 / len(self.positions_data)
@@ -95,6 +96,8 @@ class Bot(metaclass=ABCMeta):
         data['entry'] = float(record['entryPrice'])
 
     def waitUntilOrderDone(self, order_id, symbol):
+        time.sleep(1)
+
         ret = self.info.getOrder(order_id, symbol)
 
         for i in range(10):
@@ -127,7 +130,19 @@ class Bot(metaclass=ABCMeta):
 
         return self.floor(float(ret['filled']) * float(ret['average']))
 
-    def start(self):
+    @staticmethod
+    def waitUntil30CandleMade():
+        # 30분에 맞게 대기
+        minute = datetime.datetime.now().minute
+        second = datetime.datetime.now().second
+        if minute >= 30:
+            waiting_time_sec = (60 - minute) * 60 - second + 1
+        else:
+            waiting_time_sec = (30 - minute) * 60 - second + 1
+        print('Wait %d sec' % waiting_time_sec)
+        time.sleep(waiting_time_sec)
+
+    def start(self, simulate=0):
         self.updateBalance()
 
         print('Bot start!, Current USDT (free : %.4f, total : %.4f)' % (self.balance['free'], self.balance['total']))
@@ -138,15 +153,9 @@ class Bot(metaclass=ABCMeta):
             print('    [%s] Position : %s, size : (%.4f USDT)' % (data['symbol'], data['position'], data['using'] * self.leverage))
 
         while True:
-            # 30분에 맞게 대기
-            minute = datetime.datetime.now().minute
-            second = datetime.datetime.now().second
-            if minute >= 30:
-                waiting_time_sec = (60 - minute) * 60 - second + 1
-            else:
-                waiting_time_sec = (30 - minute) * 60 - second + 1
-            print('Wait %d sec' % waiting_time_sec)
-            time.sleep(waiting_time_sec)
+            self.waitUntil30CandleMade()
+
+            self.updateBalance()
 
             for data in self.positions_data:
                 self.updatePositions(data)
@@ -161,6 +170,7 @@ class Bot(metaclass=ABCMeta):
                     'close': now_record['close'],
                     'prev_close': prev_record['close'],
                     'bb_h': now_record['bb_bbh'],
+                    'bb_m': now_record['bb_bbm'],
                     'bb_l': now_record['bb_bbl'],
                     'rsi': now_record['rsi'],
                     'prev_rsi': prev_record['rsi']
@@ -180,7 +190,7 @@ class Bot(metaclass=ABCMeta):
                             using_usdt += self.balance['total'] * self.added_amount_per
 
                         if using_usdt > 0:
-                            # 손절각일 경우 손절 후 물타기
+                            # 손절각일 경우 손절
                             if data['using'] + using_usdt > self.balance['total'] * self.stop_loss_threshold_total_per:
                                 using_usdt_leverage = data['using'] * self.leverage
                                 gain_usdt_leverage = self.sellOrder(data, data['amount'] * self.stop_loss_amount_per / self.info.leverage)
@@ -188,6 +198,7 @@ class Bot(metaclass=ABCMeta):
                                 print('%s [%s] Long S/L - size : (%.4f USDT / %.4f USDT)' % (candle['date'], data['symbol'], gain_usdt_leverage, data['amount'] * data['entry']))
                                 print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (gain_usdt_leverage - using_usdt_leverage, self.balance['total']))
                                 self.telegram.sendTelegramPush(self.title, '%s [%s]' % (candle['date'], data['symbol']), 'Long 손절 - size : (%.4f USDT / %.4f USDT)' % (gain_usdt_leverage, data['amount'] * data['entry']), '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (gain_usdt_leverage - using_usdt_leverage, self.balance['total']))
+                            # 물타기
                             else:
                                 price = candle['close'] + data['quote']
                                 ret = self.buyOrder(data, using_usdt / price)
@@ -212,7 +223,7 @@ class Bot(metaclass=ABCMeta):
                             using_usdt += self.balance['total'] * self.added_amount_per
 
                         if using_usdt > 0:
-                            # 손절각일 경우 손절 후 물타기
+                            # 손절각일 경우 손절
                             if data['using'] + using_usdt > self.balance['total'] * self.stop_loss_threshold_total_per:
                                 gain_usdt_leverage = data['using'] * self.leverage
                                 using_usdt_leverage = self.buyOrder(data, data['amount'] * self.stop_loss_amount_per / self.info.leverage)
@@ -220,6 +231,7 @@ class Bot(metaclass=ABCMeta):
                                 print('%s [%s] Short S/L - size : (%.4f USDT / %.4f USDT)' % (candle['date'], data['symbol'], using_usdt_leverage, data['amount'] * data['entry']))
                                 print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (gain_usdt_leverage - using_usdt_leverage, self.balance['total']))
                                 self.telegram.sendTelegramPush(self.title, '%s [%s]' % (candle['date'], data['symbol']), 'Short 손절 - size : (%.4f USDT / %.4f USDT)' % (gain_usdt_leverage, data['amount'] * data['entry']), '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (gain_usdt_leverage - using_usdt_leverage, self.balance['total']))
+                            # 물타기
                             else:
                                 price = candle['close'] - data['quote']
                                 ret = self.sellOrder(data, using_usdt / price)
@@ -237,7 +249,8 @@ class Bot(metaclass=ABCMeta):
                             print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (gain_usdt_leverage - using_usdt_leverage, self.balance['total']))
                             self.telegram.sendTelegramPush(self.title, '%s [%s]' % (candle['date'], data['symbol']), 'Short 종료 - size : (%.4f USDT)' % using_usdt_leverage, '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (gain_usdt_leverage - using_usdt_leverage, self.balance['total']))
 
-                if data['position'] is None:
+                bb_height_per = (candle['bb_h'] - candle['bb_l']) / candle['bb_m']
+                if bb_height_per > 0.03 and data['position'] is None:
                     # 진입 체크
                     using_usdt = self.balance['total'] * self.entry_amount_per
 
@@ -447,3 +460,13 @@ class Bot(metaclass=ABCMeta):
         return math.floor(num * 100000000) / 100000000
 
     #   self.telegram.sendTelegramPush(self.info.title, '체인 성공 %s' % symbol, '최종 이익 %.8f, 이익률 %.2f%%' % (current_amount - start_amount, profit_rate * 100))
+
+
+if len(sys.argv) <= 1:
+    config_file_name = 'config.json'
+else:
+    config_file_name = sys.argv[1]
+
+#  bot.Bot(config_file_name).simulate(48*14)
+Bot(config_file_name).start()
+
