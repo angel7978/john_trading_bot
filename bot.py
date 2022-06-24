@@ -149,6 +149,7 @@ class Bot(metaclass=ABCMeta):
             time.sleep(waiting_time_sec)
 
             for data in self.positions_data:
+                self.updatePositions(data)
                 df = self.book.generate_chart_data(data['symbol'])
 
                 prev_record = df.iloc[-2]
@@ -161,8 +162,6 @@ class Bot(metaclass=ABCMeta):
                     'prev_close': prev_record['close'],
                     'bb_h': now_record['bb_bbh'],
                     'bb_l': now_record['bb_bbl'],
-                    'prev_bb_h': prev_record['bb_bbh'],
-                    'prev_bb_l': prev_record['bb_bbl'],
                     'rsi': now_record['rsi'],
                     'prev_rsi': prev_record['rsi']
                 }
@@ -197,9 +196,8 @@ class Bot(metaclass=ABCMeta):
                                 self.telegram.sendTelegramPush(self.title, '%s [%s]' % (candle['date'], data['symbol']), 'Long 추매 - size : (%.4f USDT / %.4f USDT)' % (using_usdt * self.leverage, data['using'] * self.leverage))
 
                         # 종료 체크
-                        prev_clearing_price = candle['prev_bb_l'] + (candle['prev_bb_h'] - candle['prev_bb_l']) * self.close_position_threshold_bb_height
                         now_clearing_price = candle['bb_l'] + (candle['bb_h'] - candle['bb_l']) * self.close_position_threshold_bb_height
-                        if prev_clearing_price < candle['prev_close'] and now_clearing_price > candle['close']:
+                        if now_clearing_price < candle['close']:
                             using_usdt_leverage = data['using'] * self.leverage
                             gain_usdt_leverage = self.sellOrder(data, data['amount'] / self.info.leverage)
 
@@ -230,9 +228,8 @@ class Bot(metaclass=ABCMeta):
                                 self.telegram.sendTelegramPush(self.title, '%s [%s]' % (candle['date'], data['symbol']), 'Short 추매 - size : (%.4f USDT / %.4f USDT)' % (using_usdt * self.leverage, data['using'] * self.leverage))
 
                         # 종료 체크
-                        prev_clearing_price = candle['prev_bb_h'] - (candle['prev_bb_h'] - candle['prev_bb_l']) * self.close_position_threshold_bb_height
                         now_clearing_price = candle['bb_h'] - (candle['bb_h'] - candle['bb_l']) * self.close_position_threshold_bb_height
-                        if prev_clearing_price > candle['prev_close'] and now_clearing_price < candle['close']:
+                        if now_clearing_price > candle['close']:
                             gain_usdt_leverage = data['using'] * self.leverage
                             using_usdt_leverage = self.buyOrder(data, data['amount'] / self.info.leverage)
 
@@ -244,7 +241,7 @@ class Bot(metaclass=ABCMeta):
                     # 진입 체크
                     using_usdt = self.balance['total'] * self.entry_amount_per
 
-                    if False and candle['close'] < candle['bb_l']:
+                    if candle['close'] < candle['bb_l']:
                         price = candle['close'] + data['quote']
                         ret = self.buyOrder(data, using_usdt / price)
 
