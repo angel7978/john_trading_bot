@@ -1,7 +1,7 @@
 # john_trading_bot
 
 
-= 바이낸스 api 발급 =
+== 바이낸스 api 발급 ==
 Enable Reading, Enable Spot & Margin Trading, Enable Futures 체크
 
 
