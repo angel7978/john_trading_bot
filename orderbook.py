@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from ta.utils import dropna
 from ta.volatility import BollingerBands
 from ta.momentum import RSIIndicator
-import matplotlib.pyplot as plt
+import numpy as np
 
 
 class OrderBook:
@@ -18,7 +18,7 @@ class OrderBook:
             'defaultType': 'future'
         }})
 
-    def generate_chart_data(self, symbol, limit=25):
+    def generate_chart_data(self, symbol, limit=100):
         btc = self.exchange.fetch_ohlcv(
             symbol=symbol,
             timeframe='30m',
@@ -29,8 +29,8 @@ class OrderBook:
         df = pd.DataFrame(data=btc, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
         ms = time.time() * 1000.0
 
-        if ms - 1800000 < df.iloc[-1, 0]:
-            df = df.iloc[:-1, :]
+        #if ms - 1800000 < df.iloc[-1, 0]:
+        #    df = df.iloc[:-1, :]
 
         df['datetime'] = pd.to_datetime(df['datetime'], unit='ms')
         df['datetime'] = pd.DatetimeIndex(df['datetime']) + timedelta(hours=9) + timedelta(minutes=30)

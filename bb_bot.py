@@ -270,7 +270,7 @@ class Bot(metaclass=ABCMeta):
 
         if self.is_simulate:
             for data in self.positions_data:
-                data['last_df'] = self.book.generate_chart_data(data['symbol'], simulate + 20)
+                data['last_df'] = self.book.generate_chart_data(data['symbol'], simulate + 100)
 
         candle_count = 0
         while not self.is_simulate or candle_count < simulate:
