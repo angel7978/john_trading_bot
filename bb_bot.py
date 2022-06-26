@@ -86,7 +86,6 @@ class Bot(metaclass=ABCMeta):
 
     def updatePositions(self, data):
         record = self.info.getPosition(data['symbol'])
-        print(record)
         amount = float(record['positionAmt'])
         if amount < 0:
             data['position'] = 'Short'
