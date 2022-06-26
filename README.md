@@ -5,12 +5,15 @@
 - Enable Reading, Enable Spot & Margin Trading, Enable Futures 체크
 
 
+
 config 파일 설정
 - config_example.json => config.json 으로 변경 후 내용 채워 넣기
 
 
+
 python 3.7 이상 구동
 > python bb_bot.py config.json
+
 
 
 모듈 설치
@@ -21,9 +24,11 @@ python 3.7 이상 구동
 > pip install matplotlib
 
 
+
 텔레그램 push 받고 싶을 경우
 - @arbitrage_johnpak_bot 찾아서 start 후
 - config 파일 내 telegram_id 부분에 텔레그램 id 넣기 (안드로이드 세팅 -> 계정 및 백업 -> 계정 관리 -> 텔레그램에서 확인 가능) 
+
 
 
 기본 로직 (롱)
@@ -44,6 +49,7 @@ if 손실
 조건이 동시에 만족하면 각각 5프로씩 추가매수
 
 물탄후 볼린저상단 4/5 지점오면 시장가 매도
+
 물탄비율이 원금의 50%가 넘게 되면 보유수량의 절반 매도 후 'if손실' 조건으로 지속 진행 
 
 바이낸스에서 BTCUSDT, ETHUSDT 두 개 체인 x5로 선물 거래 
