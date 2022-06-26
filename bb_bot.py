@@ -254,7 +254,7 @@ class Bot(metaclass=ABCMeta):
         if self.is_simulate:
             return
 
-        self.telegram.sendTelegramPush(msgs)
+        self.telegram.sendTelegramPush(*msgs)
 
     def start(self, simulate=0):
         self.is_simulate = simulate != 0
