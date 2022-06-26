@@ -10,7 +10,7 @@ config 파일 설정
 
 
 python 3.7 이상 구동
-> python main.py config.json
+> python bb_bot.py config.json
 
 
 모듈 설치
