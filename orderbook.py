@@ -33,7 +33,7 @@ class OrderBook:
             df = df.iloc[:-1, :]
 
         df['datetime'] = pd.to_datetime(df['datetime'], unit='ms')
-        df['datetime'] = pd.DatetimeIndex(df['datetime']) + timedelta(hours=9)
+        df['datetime'] = pd.DatetimeIndex(df['datetime']) + timedelta(hours=9) + timedelta(minutes=30)
 
         df = dropna(df)
         indicator_bb = BollingerBands(close=df["close"], window=20, window_dev=2)
