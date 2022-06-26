@@ -320,7 +320,7 @@ class Bot(metaclass=ABCMeta):
                                 print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (pnl, self.balance['total']))
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 손절 - size : (%.4f USDT)' % (data['amount'] * data['entry']), '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (pnl, self.balance['total']))
                             # 물타기
-                            else:
+                            elif price < data['entry']:
                                 self.buyOrder(data, using_usdt / price, price)
 
                                 print('%s [%s] Long Chasing (%s) - size : (%.4f USDT / %.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt * self.leverage, data['using'] * self.leverage))
@@ -359,7 +359,7 @@ class Bot(metaclass=ABCMeta):
                                 print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (pnl, self.balance['total']))
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 손절 - size : (%.4f USDT)' % (data['amount'] * data['entry']), '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (pnl, self.balance['total']))
                             # 물타기
-                            else:
+                            elif price > data['entry']:
                                 self.sellOrder(data, using_usdt / price, price)
 
                                 print('%s [%s] Short Chasing (%s) - size : (%.4f USDT / %.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt * self.leverage, data['using'] * self.leverage))
