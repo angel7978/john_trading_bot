@@ -77,7 +77,7 @@ class MyInfo:
         if market:
             ret = self.exchange.create_market_buy_order(symbol, amount)
         else:
-            ret = self.exchange.create_limit_buy_order(symbol, price, amount)
+            ret = self.exchange.create_limit_buy_order(symbol, amount, price)
         # print(ret)
         return ret
 
@@ -85,7 +85,7 @@ class MyInfo:
         if market:
             ret = self.exchange.create_market_sell_order(symbol, amount)
         else:
-            ret = self.exchange.create_limit_sell_order(symbol, price, amount)
+            ret = self.exchange.create_limit_sell_order(symbol, amount, price)
         # print(ret)
         # {'info': {'orderId': '21869924860', 'symbol': 'XRPUSDT', 'status': 'FILLED', 'clientOrderId': 'x-xcKtGhcud7d3dd4a62d03a19f60198', 'price': '0', 'avgPrice': '0.40700', 'origQty': '30', 'executedQty': '30', 'cumQty': '30', 'cumQuote': '12.21000', 'timeInForce': 'GTC', 'type': 'MARKET', 'reduceOnly': False, 'closePosition': False, 'side': 'SELL', 'positionSide': 'BOTH', 'stopPrice': '0', 'workingType': 'CONTRACT_PRICE', 'priceProtect': False, 'origType': 'MARKET', 'updateTime': '1654841602905'}, 'id': '21869924860', 'clientOrderId': 'x-xcKtGhcud7d3dd4a62d03a19f60198', 'timestamp': None, 'datetime': None, 'lastTradeTimestamp': None, 'symbol': 'XRP/USDT', 'type': 'market', 'timeInForce': 'GTC', 'postOnly': False, 'reduceOnly': False, 'side': 'sell', 'price': 0.407, 'stopPrice': None, 'amount': 30.0, 'cost': 12.21, 'average': 0.407, 'filled': 30.0, 'remaining': 0.0, 'status': 'closed', 'fee': None, 'trades': [], 'fees': []}
         return ret

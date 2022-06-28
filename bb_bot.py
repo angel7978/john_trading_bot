@@ -127,9 +127,16 @@ class Bot(metaclass=ABCMeta):
         self.sendTelegramPush(self.title, '거래 에러', '주문이 닫히지 않습니다. 확인 해 주세요.')
         '''
 
-    def makeSellOrder(self, data, amount, price):
+    def cancelAllOpenOrder(self, symbol):
         if self.is_simulate:
             pass
+        else:
+            self.info.cancelAllOpenOrder(symbol)
+
+    def makeSellOrder(self, data, amount, price, candle_now, candle_prev):
+        if self.is_simulate:
+            if candle_now['high'] >= candle_prev['bb_h']:
+                self.sellOrder(data, amount, candle_prev['bb_h'])
         else:
             self.info.sellOrder(data['symbol'], amount, price, False)
 
@@ -176,16 +183,17 @@ class Bot(metaclass=ABCMeta):
 
             self.waitUntilOrderDone(ret['id'], data['symbol'])
 
-            self.updateBalance()
             self.updatePositions(data)
+            self.updateBalance()
 
             post_pnl = data['pnl']
 
             return self.floor(pre_pnl - post_pnl)
 
-    def makeBuyOrder(self, data, amount, price):
+    def makeBuyOrder(self, data, amount, price, candle_now, candle_prev):
         if self.is_simulate:
-            pass
+            if candle_now['low'] <= candle_prev['bb_l']:
+                self.sellOrder(data, amount, candle_prev['bb_l'])
         else:
             self.info.buyOrder(data['symbol'], amount, price, False)
 
@@ -233,8 +241,8 @@ class Bot(metaclass=ABCMeta):
 
             self.waitUntilOrderDone(ret['id'], data['symbol'])
 
-            self.updateBalance()
             self.updatePositions(data)
+            self.updateBalance()
 
             post_pnl = data['pnl']
 
@@ -293,7 +301,7 @@ class Bot(metaclass=ABCMeta):
 
         candle_count = 0
         while not self.is_simulate or candle_count < simulate:
-            self.waitUntil30CandleMade()
+            # self.waitUntil30CandleMade()
 
             self.updateBalance()
 
@@ -314,6 +322,7 @@ class Bot(metaclass=ABCMeta):
 
                     print("- Candle data [%s]" % data['symbol'])
                     print(candle_now)
+
                 if data['position'] is not None:
                     using_usdt = 0
 
@@ -400,7 +409,7 @@ class Bot(metaclass=ABCMeta):
                             print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (pnl, self.balance['total']))
                             self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 종료 - size : (%.4f USDT)' % using_usdt_leverage, '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (pnl, self.balance['total']))
 
-                self.info.cancelAllOpenOrder(data['symbol'])
+                self.cancelAllOpenOrder(data['symbol'])
 
                 if data['position'] is None:
                     # 진입 체크
@@ -421,9 +430,9 @@ class Bot(metaclass=ABCMeta):
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 진입 - size : (%.4f USDT)' % (using_usdt * self.leverage))
 
                 if data['position'] == 'Long':
-                    self.makeSellOrder(data, data['amount'], candle_now['bb_h'])
+                    self.makeSellOrder(data, data['amount'], candle_now['bb_h'], candle_now, candle_prev)
                 elif data['position'] == 'Short':
-                    self.makeBuyOrder(data, data['amount'], candle_now['bb_l'])
+                    self.makeBuyOrder(data, data['amount'], candle_now['bb_l'], candle_now, candle_prev)
 
             candle_count += 1
 
