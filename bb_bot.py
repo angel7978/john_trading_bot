@@ -301,7 +301,7 @@ class Bot(metaclass=ABCMeta):
 
         candle_count = 0
         while not self.is_simulate or candle_count < simulate:
-            # self.waitUntil30CandleMade()
+            self.waitUntil30CandleMade()
 
             self.updateBalance()
 
