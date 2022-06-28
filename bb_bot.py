@@ -30,6 +30,17 @@ class Bot(metaclass=ABCMeta):
             'last_df_30m': pd.DataFrame(),
             'last_df_1d': pd.DataFrame()
         },
+        {
+            'symbol': 'ETHUSDT',
+            'quote': 0.01,
+            'position': None,
+            'amount': 0,
+            'using': 0,
+            'entry': 0,
+            'pnl': 0,
+            'last_df_30m': pd.DataFrame(),
+            'last_df_1d': pd.DataFrame()
+        }
     ]
     '''
         {
@@ -116,10 +127,15 @@ class Bot(metaclass=ABCMeta):
         self.sendTelegramPush(self.title, '거래 에러', '주문이 닫히지 않습니다. 확인 해 주세요.')
         '''
 
+    def makeSellOrder(self, data, amount, price):
+        if self.is_simulate:
+            pass
+        else:
+            self.info.sellOrder(data['symbol'], amount, price, False)
+
     def sellOrder(self, data, amount, price):
         if self.is_simulate:
-            amount_leverage = amount * self.leverage
-            gain_usdt_leverage = price * amount_leverage
+            gain_usdt_leverage = price * amount
             my_usdt_leverage = data['entry'] * data['amount']
             commission = gain_usdt_leverage * self.info.commission
             pnl = 0
@@ -129,26 +145,26 @@ class Bot(metaclass=ABCMeta):
             if data['position'] is None:
                 data['position'] = 'Short'
 
-                data['amount'] = amount_leverage
+                data['amount'] = amount
                 data['entry'] = price
-                data['using'] = price * amount
+                data['using'] = price * amount / self.leverage
             elif data['position'] == 'Short':  # chasing
                 total_gain = gain_usdt_leverage + my_usdt_leverage
-                total_amount = amount_leverage + data['amount']
+                total_amount = amount + data['amount']
 
                 data['using'] = total_gain / self.leverage
                 data['amount'] = total_amount
                 data['entry'] = self.floor(total_gain / total_amount)
             else:
-                if data['amount'] == amount_leverage:  # close
+                if data['amount'] == amount:  # close
                     data['position'] = None
                     data['amount'] = data['using'] = data['entry'] = data['commission'] = 0
 
                     pnl = gain_usdt_leverage - my_usdt_leverage
                 else:  # s/l
                     pre_pnl = (price - data['entry']) * data['amount']
-                    data['using'] -= amount * data['entry']
-                    data['amount'] -= amount_leverage
+                    data['using'] -= amount * data['entry'] / self.leverage
+                    data['amount'] -= amount
                     post_pnl = (price - data['entry']) * data['amount']
 
                     pnl = pre_pnl - post_pnl
@@ -156,7 +172,7 @@ class Bot(metaclass=ABCMeta):
             return pnl
         else:
             pre_pnl = data['pnl']
-            ret = self.info.sellOrder(data['symbol'], amount)
+            ret = self.info.sellOrder(data['symbol'], amount, price)
 
             self.waitUntilOrderDone(ret['id'], data['symbol'])
 
@@ -167,10 +183,15 @@ class Bot(metaclass=ABCMeta):
 
             return self.floor(pre_pnl - post_pnl)
 
+    def makeBuyOrder(self, data, amount, price):
+        if self.is_simulate:
+            pass
+        else:
+            self.info.buyOrder(data['symbol'], amount, price, False)
+
     def buyOrder(self, data, amount, price):
         if self.is_simulate:
-            amount_leverage = amount * self.leverage
-            using_usdt_leverage = price * amount_leverage
+            using_usdt_leverage = price * amount
             my_usdt_leverage = data['entry'] * data['amount']
             commission = using_usdt_leverage * self.info.commission
             pnl = 0
@@ -181,26 +202,26 @@ class Bot(metaclass=ABCMeta):
             if data['position'] is None:
                 data['position'] = 'Long'
 
-                data['amount'] = amount_leverage
+                data['amount'] = amount
                 data['entry'] = price
-                data['using'] = price * amount
+                data['using'] = price * amount / self.leverage
             elif data['position'] == 'Long':  # chasing
                 total_using = using_usdt_leverage + my_usdt_leverage
-                total_amount = amount_leverage + data['amount']
+                total_amount = amount + data['amount']
 
                 data['using'] = total_using / self.leverage
                 data['amount'] = total_amount
                 data['entry'] = self.floor(total_using / total_amount)
             else:
-                if data['amount'] == amount_leverage:  # close
+                if data['amount'] == amount:  # close
                     data['position'] = None
                     data['amount'] = data['using'] = data['entry'] = data['commission'] = 0
 
                     pnl = my_usdt_leverage - using_usdt_leverage
                 else:  # s/l
                     pre_pnl = (price - data['entry']) * data['amount']
-                    data['using'] -= amount * data['entry']
-                    data['amount'] -= amount_leverage
+                    data['using'] -= amount * data['entry'] / self.leverage
+                    data['amount'] -= amount
                     post_pnl = (price - data['entry']) * data['amount']
 
                     pnl = pre_pnl - post_pnl
@@ -208,7 +229,7 @@ class Bot(metaclass=ABCMeta):
             return pnl
         else:
             pre_pnl = data['pnl']
-            ret = self.info.buyOrder(data['symbol'], amount)
+            ret = self.info.buyOrder(data['symbol'], amount, price)
 
             self.waitUntilOrderDone(ret['id'], data['symbol'])
 
@@ -314,14 +335,14 @@ class Bot(metaclass=ABCMeta):
                         if using_usdt > 0:
                             # 손절각일 경우 손절
                             if data['using'] + using_usdt > self.balance['total'] * self.stop_loss_threshold_total_per:
-                                pnl = self.sellOrder(data, data['amount'] * self.stop_loss_amount_per / self.leverage, price)
+                                pnl = self.sellOrder(data, data['amount'] * self.stop_loss_amount_per, price)
 
                                 print('%s [%s] Long S/L - size : (%.4f USDT)' % (candle_now['date'], data['symbol'], data['amount'] * data['entry']))
                                 print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (pnl, self.balance['total']))
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 손절 - size : (%.4f USDT)' % (data['amount'] * data['entry']), '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (pnl, self.balance['total']))
                             # 물타기
                             elif price < data['entry']:
-                                self.buyOrder(data, using_usdt / price, price)
+                                self.buyOrder(data, using_usdt * self.leverage / price, price)
 
                                 print('%s [%s] Long Chasing (%s) - size : (%.4f USDT / %.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt * self.leverage, data['using'] * self.leverage))
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 추매 - size : (%.4f USDT / %.4f USDT)' % (using_usdt * self.leverage, data['using'] * self.leverage))
@@ -330,11 +351,15 @@ class Bot(metaclass=ABCMeta):
                         now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         if now_clearing_price < candle_now['close'] or candle_1d['low'] < candle_1d['bb_l'] or candle_1d['rsi'] < 20:
                             gain_usdt_leverage = data['amount'] * price
-                            pnl = self.sellOrder(data, data['amount'] / self.leverage, price)
+                            pnl = self.sellOrder(data, data['amount'], price)
 
                             print('%s [%s] Long Close - size : (%.4f USDT)' % (candle_now['date'], data['symbol'], gain_usdt_leverage))
                             print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (pnl, self.balance['total']))
                             self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 종료 - size : (%.4f USDT)' % gain_usdt_leverage, '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (pnl, self.balance['total']))
+                        else:
+                            # clear order
+                            # open order
+                            pass
                     else:
                         price = candle_now['close'] - data['quote']
 
@@ -353,14 +378,14 @@ class Bot(metaclass=ABCMeta):
                         if using_usdt > 0:
                             # 손절각일 경우 손절
                             if data['using'] + using_usdt > self.balance['total'] * self.stop_loss_threshold_total_per:
-                                pnl = self.buyOrder(data, data['amount'] * self.stop_loss_amount_per / self.leverage, price)
+                                pnl = self.buyOrder(data, data['amount'] * self.stop_loss_amount_per, price)
 
                                 print('%s [%s] Short S/L - size : (%.4f USDT)' % (candle_now['date'], data['symbol'], data['amount'] * data['entry']))
                                 print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (pnl, self.balance['total']))
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 손절 - size : (%.4f USDT)' % (data['amount'] * data['entry']), '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (pnl, self.balance['total']))
                             # 물타기
                             elif price > data['entry']:
-                                self.sellOrder(data, using_usdt / price, price)
+                                self.sellOrder(data, using_usdt * self.leverage / price, price)
 
                                 print('%s [%s] Short Chasing (%s) - size : (%.4f USDT / %.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt * self.leverage, data['using'] * self.leverage))
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 추매 - size : (%.4f USDT / %.4f USDT)' % (using_usdt * self.leverage, data['using'] * self.leverage))
@@ -369,11 +394,13 @@ class Bot(metaclass=ABCMeta):
                         now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         if now_clearing_price > candle_now['close'] or candle_1d['high'] > candle_1d['bb_h'] or candle_1d['rsi'] > 80:
                             using_usdt_leverage = data['amount'] * price
-                            pnl = self.buyOrder(data, data['amount'] / self.leverage, price)
+                            pnl = self.buyOrder(data, data['amount'], price)
 
                             print('%s [%s] Short Close - size : (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt_leverage))
                             print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (pnl, self.balance['total']))
                             self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 종료 - size : (%.4f USDT)' % using_usdt_leverage, '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (pnl, self.balance['total']))
+
+                self.info.cancelAllOpenOrder(data['symbol'])
 
                 if data['position'] is None:
                     # 진입 체크
@@ -381,17 +408,22 @@ class Bot(metaclass=ABCMeta):
 
                     if candle_1d['low'] >= candle_1d['bb_l'] and candle_1d['rsi'] <= 80 and candle_now['close'] < candle_now['bb_l']:
                         price = candle_now['close'] + data['quote']
-                        self.buyOrder(data, using_usdt / price, price)
+                        self.buyOrder(data, using_usdt * self.leverage / price, price)
 
                         print('%s [%s] Long Entry - size : (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt * self.leverage))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 진입 - size : (%.4f USDT)' % (using_usdt * self.leverage))
 
                     elif candle_1d['high'] <= candle_1d['bb_h'] and candle_1d['rsi'] >= 20 and candle_now['close'] > candle_now['bb_h']:
                         price = candle_now['close'] - data['quote']
-                        self.sellOrder(data, using_usdt / price, price)
+                        self.sellOrder(data, using_usdt * self.leverage / price, price)
 
                         print('%s [%s] Short Entry - size : (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt * self.leverage))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 진입 - size : (%.4f USDT)' % (using_usdt * self.leverage))
+
+                if data['position'] == 'Long':
+                    self.makeSellOrder(data, data['amount'], candle_now['bb_h'])
+                elif data['position'] == 'Short':
+                    self.makeBuyOrder(data, data['amount'], candle_now['bb_l'])
 
             candle_count += 1
 
