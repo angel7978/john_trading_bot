@@ -18,10 +18,10 @@ class OrderBook:
             'defaultType': 'future'
         }})
 
-    def generate_chart_data(self, symbol, limit=100):
+    def generate_chart_data(self, symbol, timeframe='30m', limit=100):
         btc = self.exchange.fetch_ohlcv(
             symbol=symbol,
-            timeframe='30m',
+            timeframe=timeframe,
             since=None,
             limit=limit
         )
@@ -29,8 +29,8 @@ class OrderBook:
         df = pd.DataFrame(data=btc, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
         ms = time.time() * 1000.0
 
-        #if ms - 1800000 < df.iloc[-1, 0]:
-        #    df = df.iloc[:-1, :]
+        if timeframe == '1d' or ms - 1800000 < df.iloc[-1, 0]:
+            df = df.iloc[:-1, :]
 
         df['datetime'] = pd.to_datetime(df['datetime'], unit='ms')
         df['datetime'] = pd.DatetimeIndex(df['datetime']) + timedelta(hours=9) + timedelta(minutes=30)
@@ -47,8 +47,10 @@ class OrderBook:
         df['rsi'] = indicator_rsi.rsi()
 
         '''
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.max_rows', None)
         print(df)
-        
+       
         plt.figure(figsize=(9, 5))
         plt.plot(df['datetime'], df['close'], label='close')
         plt.plot(df['datetime'], df['bb_bbh'], linestyle='dashed', label='Upper band')

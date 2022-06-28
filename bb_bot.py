@@ -27,18 +27,9 @@ class Bot(metaclass=ABCMeta):
             'using': 0,
             'entry': 0,
             'pnl': 0,
-            'last_df': pd.DataFrame()
+            'last_df_30m': pd.DataFrame(),
+            'last_df_1d': pd.DataFrame()
         },
-        {
-            'symbol': 'ETHUSDT',
-            'quote': 0.01,
-            'position': None,
-            'amount': 0,
-            'using': 0,
-            'entry': 0,
-            'pnl': 0,
-            'last_df': pd.DataFrame()
-        }
     ]
     '''
         {
@@ -49,7 +40,8 @@ class Bot(metaclass=ABCMeta):
             'using': 0,
             'entry': 0,
             'pnl': 0,
-            'last_df': pd.DataFrame()
+            'last_df_30m': pd.DataFrame(),
+            'last_df_1d': pd.DataFrame()
         },
         {
             'symbol': 'ETHUSDT',
@@ -59,7 +51,8 @@ class Bot(metaclass=ABCMeta):
             'using': 0,
             'entry': 0,
             'pnl': 0,
-            'last_df': pd.DataFrame()
+            'last_df_30m': pd.DataFrame(),
+            'last_df_1d': pd.DataFrame()
         }'''
     leverage = 5
     is_simulate = False
@@ -107,8 +100,9 @@ class Bot(metaclass=ABCMeta):
         if self.is_simulate:
             return
 
-        time.sleep(1)
+        time.sleep(5)
 
+        '''
         ret = self.info.getOrder(order_id, symbol)
 
         for i in range(10):
@@ -120,6 +114,7 @@ class Bot(metaclass=ABCMeta):
 
         print('Order closing timeout')
         self.sendTelegramPush(self.title, '거래 에러', '주문이 닫히지 않습니다. 확인 해 주세요.')
+        '''
 
     def sellOrder(self, data, amount, price):
         if self.is_simulate:
@@ -244,6 +239,8 @@ class Bot(metaclass=ABCMeta):
             'date': record['datetime'],
             'open': record['open'],
             'close': record['close'],
+            'low': record['low'],
+            'high': record['high'],
             'bb_h': record['bb_bbh'],
             'bb_m': record['bb_bbm'],
             'bb_l': record['bb_bbl'],
@@ -270,7 +267,8 @@ class Bot(metaclass=ABCMeta):
 
         if self.is_simulate:
             for data in self.positions_data:
-                data['last_df'] = self.book.generate_chart_data(data['symbol'], simulate + 100)
+                data['last_df_30m'] = self.book.generate_chart_data(data['symbol'], '30m', simulate + 100)
+                data['last_df_1d'] = self.book.generate_chart_data(data['symbol'], '1d', int(simulate / 48) + 100)
 
         candle_count = 0
         while not self.is_simulate or candle_count < simulate:
@@ -282,17 +280,19 @@ class Bot(metaclass=ABCMeta):
                 self.updatePositions(data)
 
                 if self.is_simulate:
-                    candle_prev = self.createCandle(data['last_df'].iloc[-simulate + candle_count - 1])
-                    candle_now = self.createCandle(data['last_df'].iloc[-simulate + candle_count])
+                    candle_prev = self.createCandle(data['last_df_30m'].iloc[-simulate + candle_count - 1])
+                    candle_now = self.createCandle(data['last_df_30m'].iloc[-simulate + candle_count])
+                    candle_1d = self.createCandle(data['last_df_1d'].iloc[int((-simulate + candle_count - 25) / 48) - 1])
                 else:
                     df = self.book.generate_chart_data(data['symbol'])
+                    df_1d = self.book.generate_chart_data(data['symbol'], '1d')
 
                     candle_prev = self.createCandle(df.iloc[-2])
                     candle_now = self.createCandle(df.iloc[-1])
+                    candle_1d = self.createCandle(df_1d.iloc[-1])
 
                     print("- Candle data [%s]" % data['symbol'])
                     print(candle_now)
-
                 if data['position'] is not None:
                     using_usdt = 0
 
@@ -328,7 +328,7 @@ class Bot(metaclass=ABCMeta):
 
                         # 종료 체크
                         now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
-                        if now_clearing_price < candle_now['close']:
+                        if now_clearing_price < candle_now['close'] or candle_1d['low'] < candle_1d['bb_l'] or candle_1d['rsi'] < 20:
                             gain_usdt_leverage = data['amount'] * price
                             pnl = self.sellOrder(data, data['amount'] / self.leverage, price)
 
@@ -367,7 +367,7 @@ class Bot(metaclass=ABCMeta):
 
                         # 종료 체크
                         now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
-                        if now_clearing_price > candle_now['close']:
+                        if now_clearing_price > candle_now['close'] or candle_1d['high'] > candle_1d['bb_h'] or candle_1d['rsi'] > 80:
                             using_usdt_leverage = data['amount'] * price
                             pnl = self.buyOrder(data, data['amount'] / self.leverage, price)
 
@@ -375,19 +375,18 @@ class Bot(metaclass=ABCMeta):
                             print('    PnL : (%.4f USDT), Wallet (%.4f USDT)' % (pnl, self.balance['total']))
                             self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 종료 - size : (%.4f USDT)' % using_usdt_leverage, '순 이익 : (%.4f USDT), 현재 보유 (%.4f USDT)' % (pnl, self.balance['total']))
 
-                bb_height_per = (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m']
-                if bb_height_per > 0.03 and data['position'] is None:
+                if data['position'] is None:
                     # 진입 체크
                     using_usdt = self.balance['total'] * self.entry_amount_per
 
-                    if candle_now['close'] < candle_now['bb_l']:
+                    if candle_1d['low'] >= candle_1d['bb_l'] and candle_1d['rsi'] <= 80 and candle_now['close'] < candle_now['bb_l']:
                         price = candle_now['close'] + data['quote']
                         self.buyOrder(data, using_usdt / price, price)
 
                         print('%s [%s] Long Entry - size : (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt * self.leverage))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 진입 - size : (%.4f USDT)' % (using_usdt * self.leverage))
 
-                    elif candle_now['close'] > candle_now['bb_h']:
+                    elif candle_1d['high'] <= candle_1d['bb_h'] and candle_1d['rsi'] >= 20 and candle_now['close'] > candle_now['bb_h']:
                         price = candle_now['close'] - data['quote']
                         self.sellOrder(data, using_usdt / price, price)
 
