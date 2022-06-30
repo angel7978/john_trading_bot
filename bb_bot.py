@@ -357,7 +357,7 @@ class Bot(metaclass=ABCMeta):
 
                         # 종료 체크
                         now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
-                        if now_clearing_price < candle_now['close'] or candle_sl['low'] < candle_sl['bb_l'] or candle_sl['rsi'] < 20:
+                        if now_clearing_price < candle_now['close'] or candle_sl['low'] < candle_sl['bb_l']:
                             gain_usdt_leverage = data['amount'] * price
                             pnl = self.sellOrder(data, data['amount'], price)
 
@@ -396,7 +396,7 @@ class Bot(metaclass=ABCMeta):
 
                         # 종료 체크
                         now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
-                        if now_clearing_price > candle_now['close'] or candle_sl['high'] > candle_sl['bb_h'] or candle_sl['rsi'] > 80:
+                        if now_clearing_price > candle_now['close'] or candle_sl['high'] > candle_sl['bb_h']:
                             using_usdt_leverage = data['amount'] * price
                             pnl = self.buyOrder(data, data['amount'], price)
 
@@ -437,14 +437,14 @@ class Bot(metaclass=ABCMeta):
                 if data['position'] is None:
                     using_usdt = self.balance['total'] * self.entry_amount_per
 
-                    if candle_sl['low'] >= candle_sl['bb_l'] and candle_sl['rsi'] <= 80 and candle_now['close'] < candle_now['bb_l']:
+                    if candle_sl['low'] >= candle_sl['bb_l'] and candle_now['close'] < candle_now['bb_l']:
                         price = candle_now['close'] + data['quote']
                         self.buyOrder(data, using_usdt * self.leverage / price, price)
 
                         print('%s [%s] Long Entry - size : (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt * self.leverage))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 진입 - size : (%.4f USDT)' % (using_usdt * self.leverage))
 
-                    elif candle_sl['high'] <= candle_sl['bb_h'] and candle_sl['rsi'] >= 20 and candle_now['close'] > candle_now['bb_h']:
+                    elif candle_sl['high'] <= candle_sl['bb_h'] and candle_now['close'] > candle_now['bb_h']:
                         price = candle_now['close'] - data['quote']
                         self.sellOrder(data, using_usdt * self.leverage / price, price)
 
@@ -469,5 +469,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(48*30)
 
