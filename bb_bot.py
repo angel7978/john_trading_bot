@@ -14,7 +14,7 @@ from abc import *
 
 
 class Bot(metaclass=ABCMeta):
-    title = 'BB봇'
+    title = 'BB Bot'
     balance = {
         'total': 0.0,
         'free': 0.0
@@ -65,9 +65,11 @@ class Bot(metaclass=ABCMeta):
         with open('tickers.json') as json_file:
             self.positions_data = json.load(json_file)
 
-        self.info = myinfo.MyInfo(file_name, list(map(lambda data: data['symbol'], self.positions_data)))
-        self.book = orderbook.OrderBook()
+        self.info = myinfo.MyInfo(file_name, list(map(lambda d: d['symbol'], self.positions_data)))
+        self.book = orderbook.OrderBook(self.info.exchange_str)
         self.telegram = telegram_module.Telegram(file_name)
+
+        title = self.info.title
 
         data_length = 0
         for data in self.positions_data:
@@ -76,7 +78,7 @@ class Bot(metaclass=ABCMeta):
 
         if data_length == 0:
             data_length = 1
-            self.sendTelegramPush(self.title, '체인이 선택되지 않았습니다!! config 파일을 확인 해 주세요.')
+            self.sendTelegramPush(self.title, '체인이 선택되지 않았습니다!! config 파일을 확인 해 주세요. [%s]' % self.info.using_symbol)
 
         self.entry_amount_per = 0.2 / data_length
         self.added_amount_per = 0.05 / data_length
@@ -335,15 +337,19 @@ class Bot(metaclass=ABCMeta):
                 self.updatePositions(data)
 
                 if self.is_simulate:
-                    if candle_count % self.simulate_const[data['interval']]['simulate_candle_div'] != 0:
+                    bonus_candle_count = 0
+                    minute = datetime.datetime.now().minute
+                    if data['interval'] == '30m':
+                        bonus_candle_count = 1 if 15 <= minute < 30 or 45 <= minute < 60 else 0
+                    elif data['interval'] == '1h':
+                        bonus_candle_count = int(minute / 15)
+
+                    if (candle_count + bonus_candle_count) % self.simulate_const[data['interval']]['simulate_candle_div'] != 0:
                         continue
                     candle_idx = int((-simulate + candle_count) / self.simulate_const[data['interval']]['simulate_candle_div'])
                     candle_prev = self.createCandle(data['df_interval'].iloc[candle_idx - 1])
                     candle_now = self.createCandle(data['df_interval'].iloc[candle_idx])
                     candle_sl = self.createCandle(data['df_sl_interval'].loc[data['df_sl_interval']['datetime'] <= candle_now['datetime'] - self.simulate_const[data['sl_interval']]['candle_offset']].iloc[-1])
-                    print('%s idx = %d' % (data['symbol'], candle_idx))
-                    print('n %s' % candle_now['date'])
-                    print('s %s' % candle_sl['date'])
                 else:
                     minute = datetime.datetime.now().minute
                     if data['interval'] == '30m' and minute % 30 != 0:
@@ -485,5 +491,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(96*15)
 

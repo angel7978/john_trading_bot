@@ -4,5 +4,7 @@
   "api_key": "",
   "secret_key": "",
   "symbol": "BTCUSDT,ETHUSDT",
-  "leverage": 5
+  "leverage": 5,
+  "exchange": "binance",
+  "title": ""
 }

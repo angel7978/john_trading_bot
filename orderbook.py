@@ -43,10 +43,15 @@ class OrderBook:
         }
     }
 
-    def __init__(self):
-        self.exchange = ccxt.binance({'options': {
-            'defaultType': 'future'
-        }})
+    def __init__(self, exchange_str):
+        if exchange_str == 'bitget':
+            self.exchange = ccxt.bitget({'options': {
+                'defaultType': 'future'
+            }})
+        else:
+            self.exchange = ccxt.binance({'options': {
+                'defaultType': 'future'
+            }})
 
     def fetch_markets(self):
         ret = self.exchange.fetch_markets()
