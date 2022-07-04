@@ -78,7 +78,7 @@ class Bot(metaclass=ABCMeta):
 
         self.entry_amount_per = 0.1
         self.added_amount_per = 0.025
-        self.stop_loss_threshold_total_per = 0.2
+        self.stop_loss_threshold_total_per = 0.25
         self.stop_loss_amount_per = 0.5
         self.close_position_threshold_bb_height = 0.80
 
