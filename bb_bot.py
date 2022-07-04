@@ -76,13 +76,9 @@ class Bot(metaclass=ABCMeta):
             data['enabled'] = data['symbol'] in self.info.using_symbol
             data_length += 1 if data['enabled'] else 0
 
-        if data_length == 0:
-            data_length = 1
-            self.sendTelegramPush(self.title, '체인이 선택되지 않았습니다!! config 파일을 확인 해 주세요. [%s]' % self.info.using_symbol)
-
-        self.entry_amount_per = 0.2 / data_length
-        self.added_amount_per = 0.05 / data_length
-        self.stop_loss_threshold_total_per = 0.5 / data_length
+        self.entry_amount_per = 0.1
+        self.added_amount_per = 0.025
+        self.stop_loss_threshold_total_per = 0.2
         self.stop_loss_amount_per = 0.5
         self.close_position_threshold_bb_height = 0.80
 

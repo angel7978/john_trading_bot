@@ -29,7 +29,7 @@
     {
         "symbol": "SUSHIUSDT",
         "amount_min": 0.001,
-        "sl_interval": "1d",
+        "sl_interval": "12h",
         "best_pnl": 1884.4949516636018,
         "average_pnl": 1394.5326362894548,
         "worst_pnl": 1120.8661854752895,
@@ -119,7 +119,7 @@
     {
         "symbol": "IMXUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
+        "sl_interval": "8h",
         "best_pnl": 1779.7551272793432,
         "average_pnl": 1421.740816773384,
         "worst_pnl": 1151.4514915924435,
