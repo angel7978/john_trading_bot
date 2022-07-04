@@ -11,16 +11,16 @@ class MyInfo:
 
     access_key = ''
     secret_key = ''
-    commission = 0
+    using_symbol = ''
+    leverage = 5
 
-    def __init__(self, config_file_name, chains, leverage):
-        self.leverage = leverage
-
+    def __init__(self, config_file_name, chains):
         with open(config_file_name) as json_file:
             json_data = json.load(json_file)
             self.access_key = json_data["api_key"]
             self.secret_key = json_data["secret_key"]
-            self.commission = float(json_data["commission"])
+            self.using_symbol = json_data["symbol"]
+            self.leverage = json_data["leverage"]
 
         self.exchange = ccxt.binance({
             'apiKey': self.access_key,
@@ -36,11 +36,8 @@ class MyInfo:
         for symbol in chains:
             self.exchange.fapiPrivate_post_leverage({
                 'symbol': symbol,
-                'leverage': leverage,
+                'leverage': self.leverage,
             })
-
-    def getCommission(self):
-        return self.commission
 
     def getBalance(self, symbol):
         ret = self.exchange.fetch_balance()

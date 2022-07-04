@@ -1,6 +1,8 @@
 {
   "token": "5261491699:AAF0egguXqzOEQrCClN9PPYSxaBKFZ628QM",
   "telegram_id": "",
-  "commission": 0.0004,
   "api_key": "",
-  "secret_key": ""}
+  "secret_key": "",
+  "symbol": "BTCUSDT,ETHUSDT",
+  "leverage": 5
+}

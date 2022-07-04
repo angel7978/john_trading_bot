@@ -7,6 +7,7 @@ import orderbook
 import time
 import datetime
 import pandas as pd
+import json
 import sys
 
 from abc import *
@@ -19,59 +20,67 @@ class Bot(metaclass=ABCMeta):
         'free': 0.0
     }
     positions_data = [
-        {
-            'symbol': 'BTCUSDT',
-            'quote': 0.1,
-            'position': None,
-            'amount': 0,
-            'using': 0,
-            'entry': 0,
-            'pnl': 0,
-            'sl_interval': '12h'
-        },
-        {
-            'symbol': 'ETHUSDT',
-            'quote': 0.01,
-            'position': None,
-            'amount': 0,
-            'using': 0,
-            'entry': 0,
-            'pnl': 0,
-            'sl_interval': '6h'
-        }
     ]
-    '''
-        {
-            'symbol': 'BTCUSDT',
-            'quote': 0.1,
-            'position': None,
-            'amount': 0,
-            'using': 0,
-            'entry': 0,
-            'pnl': 0,
-            'sl_interval': '12h'
+    simulate_const = {
+        '15m': {
+            'sl_mul': 0.5,
+            'simulate_candle_div': 1
         },
-        {
-            'symbol': 'ETHUSDT',
-            'quote': 0.01,
-            'position': None,
-            'amount': 0,
-            'using': 0,
-            'entry': 0,
-            'pnl': 0,
-            'sl_interval': '6h'
-        }'''
-    leverage = 5
+        '30m': {
+            'sl_mul': 1,
+            'simulate_candle_div': 2
+        },
+        '1h': {
+            'sl_mul': 2,
+            'simulate_candle_div': 4
+        },
+        '2h': {
+            'sl_div': 4,
+            'candle_offset': 7200000
+        },
+        '4h': {
+            'sl_div': 8,
+            'candle_offset': 14400000
+        },
+        '6h': {
+            'sl_div': 12,
+            'candle_offset': 21600000
+        },
+        '8h': {
+            'sl_div': 16,
+            'candle_offset': 28800000
+        },
+        '12h': {
+            'sl_div': 24,
+            'candle_offset': 43200000
+        },
+        '1d': {
+            'sl_div': 48,
+            'candle_offset': 54000000
+        },
+    }
     is_simulate = False
 
     def __init__(self, file_name):
-        self.info = myinfo.MyInfo(file_name, list(map(lambda data: data['symbol'], self.positions_data)), self.leverage)
+        with open('tickers.json') as json_file:
+            self.positions_data = json.load(json_file)
+
+        self.info = myinfo.MyInfo(file_name, list(map(lambda data: data['symbol'], self.positions_data)))
         self.book = orderbook.OrderBook()
         self.telegram = telegram_module.Telegram(file_name)
 
-        self.entry_amount_per = 0.2 / len(self.positions_data)
-        self.added_amount_per = 0.05 / len(self.positions_data)
-        self.stop_loss_threshold_total_per = 0.5 / len(self.positions_data)
+        data_length = 0
+        for data in self.positions_data:
+            data['enabled'] = data['symbol'] in self.info.using_symbol
+            data_length += 1 if data['enabled'] else 0
+
+        if data_length == 0:
+            data_length = 1
+            self.sendTelegramPush(self.title, '체인이 선택되지 않았습니다!! config 파일을 확인 해 주세요.')
+
+        self.entry_amount_per = 0.2 / data_length
+        self.added_amount_per = 0.05 / data_length
+        self.stop_loss_threshold_total_per = 0.5 / data_length
         self.stop_loss_amount_per = 0.5
         self.close_position_threshold_bb_height = 0.80
 
@@ -132,7 +141,7 @@ class Bot(metaclass=ABCMeta):
     def makeSellOrder(self, data, amount, price, candle_now, candle_prev):
         if self.is_simulate:
             if candle_now['high'] >= candle_prev['bb_h']:
-                gain_usdt = data['amount'] * price / self.leverage
+                gain_usdt = data['amount'] * price / self.info.leverage
                 pnl = self.sellOrder(data, amount, candle_prev['bb_h'])
 
                 print('%s [%s] Long Close - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], gain_usdt))
@@ -144,7 +153,7 @@ class Bot(metaclass=ABCMeta):
         if self.is_simulate:
             gain_usdt_leverage = price * amount
             my_usdt_leverage = data['entry'] * data['amount']
-            commission = gain_usdt_leverage * self.info.commission
+            commission = gain_usdt_leverage * 0.0004
             pnl = 0
 
             self.balance['total'] -= commission
@@ -154,12 +163,12 @@ class Bot(metaclass=ABCMeta):
 
                 data['amount'] = amount
                 data['entry'] = price
-                data['using'] = price * amount / self.leverage
+                data['using'] = price * amount / self.info.leverage
             elif data['position'] == 'Short':  # chasing
                 total_gain = gain_usdt_leverage + my_usdt_leverage
                 total_amount = amount + data['amount']
 
-                data['using'] = total_gain / self.leverage
+                data['using'] = total_gain / self.info.leverage
                 data['amount'] = total_amount
                 data['entry'] = self.floor(total_gain / total_amount)
             else:
@@ -170,7 +179,7 @@ class Bot(metaclass=ABCMeta):
                     pnl = gain_usdt_leverage - my_usdt_leverage
                 else:  # s/l
                     pre_pnl = (price - data['entry']) * data['amount']
-                    data['using'] -= amount * data['entry'] / self.leverage
+                    data['using'] -= amount * data['entry'] / self.info.leverage
                     data['amount'] -= amount
                     post_pnl = (price - data['entry']) * data['amount']
 
@@ -193,7 +202,7 @@ class Bot(metaclass=ABCMeta):
     def makeBuyOrder(self, data, amount, price, candle_now, candle_prev):
         if self.is_simulate:
             if candle_now['low'] <= candle_prev['bb_l']:
-                using_usdt = data['amount'] * price / self.leverage
+                using_usdt = data['amount'] * price / self.info.leverage
                 pnl = self.buyOrder(data, amount, candle_prev['bb_l'])
 
                 print('%s [%s] Short Close - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt))
@@ -205,7 +214,7 @@ class Bot(metaclass=ABCMeta):
         if self.is_simulate:
             using_usdt_leverage = price * amount
             my_usdt_leverage = data['entry'] * data['amount']
-            commission = using_usdt_leverage * self.info.commission
+            commission = using_usdt_leverage * 0.0004
             pnl = 0
 
             self.balance['total'] += pnl
@@ -216,12 +225,12 @@ class Bot(metaclass=ABCMeta):
 
                 data['amount'] = amount
                 data['entry'] = price
-                data['using'] = price * amount / self.leverage
+                data['using'] = price * amount / self.info.leverage
             elif data['position'] == 'Long':  # chasing
                 total_using = using_usdt_leverage + my_usdt_leverage
                 total_amount = amount + data['amount']
 
-                data['using'] = total_using / self.leverage
+                data['using'] = total_using / self.info.leverage
                 data['amount'] = total_amount
                 data['entry'] = self.floor(total_using / total_amount)
             else:
@@ -232,7 +241,7 @@ class Bot(metaclass=ABCMeta):
                     pnl = my_usdt_leverage - using_usdt_leverage
                 else:  # s/l
                     pre_pnl = (price - data['entry']) * data['amount']
-                    data['using'] -= amount * data['entry'] / self.leverage
+                    data['using'] -= amount * data['entry'] / self.info.leverage
                     data['amount'] -= amount
                     post_pnl = (price - data['entry']) * data['amount']
 
@@ -252,24 +261,24 @@ class Bot(metaclass=ABCMeta):
 
             return self.floor(pre_pnl - post_pnl)
 
-    def waitUntil30CandleMade(self):
+    def waitUntil15CandleMade(self):
         if self.is_simulate:
             return
 
-        # 30분에 맞게 대기
+        # 15분에 맞게 대기
         minute = datetime.datetime.now().minute
         second = datetime.datetime.now().second
-        if minute >= 30:
-            waiting_time_sec = (60 - minute) * 60 - second + 1
-        else:
-            waiting_time_sec = (30 - minute) * 60 - second + 1
+
+        mod = minute % 15
+        waiting_time_sec = (14 - mod) * 60 + (60 - second) + 1
         print('Wait %d sec' % waiting_time_sec)
         time.sleep(waiting_time_sec)
 
     @staticmethod
     def createCandle(record):
         return {
-            'date': record['datetime'],
+            'datetime': record['datetime'],
+            'date': record['date'],
             'open': record['open'],
             'close': record['close'],
             'low': record['low'],
@@ -295,63 +304,58 @@ class Bot(metaclass=ABCMeta):
         self.sendTelegramPush(self.title, 'Bot start!', 'Free (%.4f USDT), Total (%.4f USDT)' % (self.balance['free'], self.balance['total']))
 
         for data in self.positions_data:
+            if self.is_simulate:
+                data['position'] = None
+                data['amount'] = 0
+                data['using'] = 0
+                data['entry'] = 0
+                data['pnl'] = 0
             self.updatePositions(data)
-            print('    [%s] Position (%s), Size (%.4f USDT)' % (data['symbol'], data['position'], data['using']))
+            if data['position'] is not None or data['enabled']:
+                print('    [%s] Position (%s), Size (%.4f USDT)' % (data['symbol'], data['position'], data['using']))
 
         if self.is_simulate:
             for data in self.positions_data:
-                data['last_df_30m'] = self.book.generate_chart_data(data['symbol'], '30m', simulate + 100)
-                if data['sl_interval'] == '2h':
-                    data['last_df_2h'] = self.book.generate_chart_data(data['symbol'], '2h', int(simulate / 4) + 100)
-                elif data['sl_interval'] == '4h':
-                    data['last_df_4h'] = self.book.generate_chart_data(data['symbol'], '4h', int(simulate / 8) + 100)
-                elif data['sl_interval'] == '6h':
-                    data['last_df_6h'] = self.book.generate_chart_data(data['symbol'], '6h', int(simulate / 12) + 100)
-                elif data['sl_interval'] == '8h':
-                    data['last_df_8h'] = self.book.generate_chart_data(data['symbol'], '8h', int(simulate / 16) + 100)
-                elif data['sl_interval'] == '12h':
-                    data['last_df_12h'] = self.book.generate_chart_data(data['symbol'], '12h', int(simulate / 24) + 100)
-                else:  # data['sl_interval'] == '1d':
-                    data['last_df_1d'] = self.book.generate_chart_data(data['symbol'], '1d', int(simulate / 48) + 100)
+                if not data['enabled']:
+                    continue
+
+                data['df_interval'] = self.book.generate_chart_data(data['symbol'], data['interval'], int(simulate / self.simulate_const[data['interval']]['simulate_candle_div']) + 100)
+                data['df_sl_interval'] = self.book.generate_chart_data(data['symbol'], data['sl_interval'], int(simulate * self.simulate_const[data['interval']]['sl_mul'] / self.simulate_const[data['sl_interval']]['sl_div']) + 100)
 
         candle_count = 0
         while not self.is_simulate or candle_count < simulate:
-            self.waitUntil30CandleMade()
+            self.waitUntil15CandleMade()
 
             self.updateBalance()
 
             for data in self.positions_data:
+                if data['position'] is None and not data['enabled']:
+                    continue
+
                 self.updatePositions(data)
 
                 if self.is_simulate:
-                    now = datetime.datetime.today()
-                    diff_2h_by_30m = (now.hour * 2 + int(now.minute / 30) - 1) % 4 - 4
-                    diff_4h_by_30m = (now.hour * 2 + int(now.minute / 30) - 1) % 8 - 8
-                    diff_6h_by_30m = (now.hour * 2 + int(now.minute / 30) - 5) % 12 - 12
-                    diff_8h_by_30m = (now.hour * 2 + int(now.minute / 30) - 1) % 16 - 16
-                    diff_12h_by_30m = (now.hour * 2 + int(now.minute / 30) - 17) % 24 - 24
-                    diff_1d_by_30m = now.hour * 2 + int(now.minute / 30) - 47
-
-                    candle_prev = self.createCandle(data['last_df_30m'].iloc[-simulate + candle_count - 1])
-                    candle_now = self.createCandle(data['last_df_30m'].iloc[-simulate + candle_count])
-                    if data['sl_interval'] == '2h':
-                        candle_sl = self.createCandle(data['last_df_2h'].iloc[int((-simulate + candle_count + diff_2h_by_30m) / 4) - 1])
-                    elif data['sl_interval'] == '4h':
-                        candle_sl = self.createCandle(data['last_df_4h'].iloc[int((-simulate + candle_count + diff_4h_by_30m) / 8) - 1])
-                    elif data['sl_interval'] == '6h':
-                        candle_sl = self.createCandle(data['last_df_6h'].iloc[int((-simulate + candle_count + diff_6h_by_30m) / 12) - 1])
-                    elif data['sl_interval'] == '8h':
-                        candle_sl = self.createCandle(data['last_df_8h'].iloc[int((-simulate + candle_count + diff_8h_by_30m) / 16) - 1])
-                    elif data['sl_interval'] == '12h':
-                        candle_sl = self.createCandle(data['last_df_12h'].iloc[int((-simulate + candle_count + diff_12h_by_30m) / 24) - 1])
-                    else:  # data['sl_interval'] == '1d':
-                        candle_sl = self.createCandle(data['last_df_1d'].iloc[int((-simulate + candle_count + diff_1d_by_30m) / 48) - 1])
+                    if candle_count % self.simulate_const[data['interval']]['simulate_candle_div'] != 0:
+                        continue
+                    candle_idx = int((-simulate + candle_count) / self.simulate_const[data['interval']]['simulate_candle_div'])
+                    candle_prev = self.createCandle(data['df_interval'].iloc[candle_idx - 1])
+                    candle_now = self.createCandle(data['df_interval'].iloc[candle_idx])
+                    candle_sl = self.createCandle(data['df_sl_interval'].loc[data['df_sl_interval']['datetime'] <= candle_now['datetime'] - self.simulate_const[data['sl_interval']]['candle_offset']].iloc[-1])
+                    print('%s idx = %d' % (data['symbol'], candle_idx))
+                    print('n %s' % candle_now['date'])
+                    print('s %s' % candle_sl['date'])
                 else:
-                    df_30m = self.book.generate_chart_data(data['symbol'])
+                    minute = datetime.datetime.now().minute
+                    if data['interval'] == '30m' and minute % 30 != 0:
+                        continue
+                    elif data['interval'] == '1h' and minute != 0:
+                        continue
+
+                    df_interval = self.book.generate_chart_data(data['symbol'], data['interval'])
                     df_sl = self.book.generate_chart_data(data['symbol'], data['sl_interval'])
 
-                    candle_prev = self.createCandle(df_30m.iloc[-2])
-                    candle_now = self.createCandle(df_30m.iloc[-1])
+                    candle_prev = self.createCandle(df_interval.iloc[-2])
+                    candle_now = self.createCandle(df_interval.iloc[-1])
                     candle_sl = self.createCandle(df_sl.iloc[-1])
 
                     print("- Candle data [%s]" % data['symbol'])
@@ -361,13 +365,13 @@ class Bot(metaclass=ABCMeta):
                     using_usdt = 0
 
                     if data['position'] == 'Long':
-                        price = candle_now['close'] + data['quote']
+                        price = candle_now['close'] + data['amount_min']
 
                         # 종료 체크
                         now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         if now_clearing_price < candle_now['close'] or candle_sl['low'] < candle_sl['bb_l']:
-                            using_usdt = data['amount'] * data['entry'] / self.leverage
-                            gain_usdt = data['amount'] * price / self.leverage
+                            using_usdt = data['amount'] * data['entry'] / self.info.leverage
+                            gain_usdt = data['amount'] * price / self.info.leverage
                             pnl = self.sellOrder(data, data['amount'], price)
 
                             print('%s [%s] Long Close - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt, gain_usdt))
@@ -388,27 +392,27 @@ class Bot(metaclass=ABCMeta):
 
                             if using_usdt > 0 and price < data['entry']:
                                 # 물타기
-                                self.buyOrder(data, using_usdt * self.leverage / price, price)
+                                self.buyOrder(data, using_usdt * self.info.leverage / price, price)
 
                                 print('%s [%s] Long Chasing %s (%.4f USDT) - Size (%.4f USDT / %.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt, data['using'], self.balance['total']))
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 추매 - Size (%.4f USDT / %.4f USDT)' % (data['using'], self.balance['total']))
 
                             # 손절각일 경우 손절
                             if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per:
-                                gain_usdt = data['amount'] * price * self.stop_loss_amount_per / self.leverage
+                                gain_usdt = data['amount'] * price * self.stop_loss_amount_per / self.info.leverage
                                 pnl = self.sellOrder(data, data['amount'] * self.stop_loss_amount_per, price)
 
                                 print('%s [%s] Long S/L - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], gain_usdt))
                                 print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 손절 - Size (%.4f USDT)' % gain_usdt, 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
                     else:
-                        price = candle_now['close'] - data['quote']
+                        price = candle_now['close'] - data['amount_min']
 
                         # 종료 체크
                         now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         if now_clearing_price > candle_now['close'] or candle_sl['high'] > candle_sl['bb_h']:
-                            gain_usdt = data['amount'] * data['entry'] / self.leverage
-                            using_usdt = data['amount'] * price / self.leverage
+                            gain_usdt = data['amount'] * data['entry'] / self.info.leverage
+                            using_usdt = data['amount'] * price / self.info.leverage
                             pnl = self.buyOrder(data, data['amount'], price)
 
                             print('%s [%s] Short Close - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], gain_usdt, using_usdt))
@@ -429,14 +433,14 @@ class Bot(metaclass=ABCMeta):
 
                             if using_usdt > 0 and price > data['entry']:
                                 # 물타기
-                                self.sellOrder(data, using_usdt * self.leverage / price, price)
+                                self.sellOrder(data, using_usdt * self.info.leverage / price, price)
 
                                 print('%s [%s] Short Chasing %s (%.4f USDT) - Size (%.4f USDT / %.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt, data['using'], self.balance['total']))
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 추매 - Size (%.4f USDT / %.4f USDT)' % (data['using'], self.balance['total']))
 
                             # 손절각일 경우 손절
                             if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per:
-                                using_usdt = data['amount'] * price * self.stop_loss_amount_per / self.leverage
+                                using_usdt = data['amount'] * price * self.stop_loss_amount_per / self.info.leverage
                                 pnl = self.buyOrder(data, data['amount'] * self.stop_loss_amount_per, price)
 
                                 print('%s [%s] Short S/L - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt))
@@ -446,19 +450,19 @@ class Bot(metaclass=ABCMeta):
                 self.cancelAllOpenOrder(data['symbol'])
 
                 # 진입 체크
-                if data['position'] is None:
+                if data['position'] is None and data['enabled']:
                     using_usdt = self.balance['total'] * self.entry_amount_per
 
                     if candle_sl['low'] >= candle_sl['bb_l'] and candle_now['close'] < candle_now['bb_l']:
-                        price = candle_now['close'] + data['quote']
-                        self.buyOrder(data, using_usdt * self.leverage / price, price)
+                        price = candle_now['close'] + data['amount_min']
+                        self.buyOrder(data, using_usdt * self.info.leverage / price, price)
 
                         print('%s [%s] Long Entry - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 진입 - Size (%.4f USDT / %.4f USDT)' % (using_usdt, self.balance['total']))
 
                     elif candle_sl['high'] <= candle_sl['bb_h'] and candle_now['close'] > candle_now['bb_h']:
-                        price = candle_now['close'] - data['quote']
-                        self.sellOrder(data, using_usdt * self.leverage / price, price)
+                        price = candle_now['close'] - data['amount_min']
+                        self.sellOrder(data, using_usdt * self.info.leverage / price, price)
 
                         print('%s [%s] Short Entry - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 진입 - Size (%.4f USDT / %.4f USDT)' % (using_usdt, self.balance['total']))
@@ -481,5 +485,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(96*1)
 

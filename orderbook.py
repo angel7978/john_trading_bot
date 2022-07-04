@@ -18,6 +18,14 @@ class OrderBook:
             'defaultType': 'future'
         }})
 
+    def fetch_markets(self):
+        ret = self.exchange.fetch_markets()
+        return ret
+
+    def fetch_tickers(self):
+        ret = list(map(lambda ticker: ticker.replace('/', ''), filter(lambda ticker: 'USDT' in ticker, self.exchange.fetch_tickers().keys())))
+        return ret
+
     def generate_chart_data(self, symbol, timeframe='30m', limit=100):
         btc = self.exchange.fetch_ohlcv(
             symbol=symbol,
@@ -27,14 +35,12 @@ class OrderBook:
         )
 
         df = pd.DataFrame(data=btc, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
-        ms = time.time() * 1000.0
+        df = df.iloc[:-1, :]
 
-        if timeframe != '30m' or ms - 1800000 < df.iloc[-1, 0]:
-            df = df.iloc[:-1, :]
-
-        df['datetime'] = pd.to_datetime(df['datetime'], unit='ms')
+        df['date'] = pd.to_datetime(df['datetime'], unit='ms')
         if timeframe != '1d':
-            df['datetime'] = pd.DatetimeIndex(df['datetime']) + timedelta(hours=9)
+            df['date'] = pd.DatetimeIndex(df['date']) + timedelta(hours=9)
+        df['datetime'] = df['datetime'] + 32400000
 
         df = dropna(df)
         indicator_bb = BollingerBands(close=df["close"], window=20, window_dev=2)
