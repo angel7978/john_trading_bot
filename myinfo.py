@@ -32,7 +32,7 @@ class MyInfo:
                 'secret': self.secret_key,
                 'enableRateLimit': True,
                 'options': {
-                    'defaultType': 'future'
+                    'defaultType': 'swap'
                 }
             })
         else:

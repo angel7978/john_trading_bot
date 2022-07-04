@@ -46,7 +46,7 @@ class OrderBook:
     def __init__(self, exchange_str):
         if exchange_str == 'bitget':
             self.exchange = ccxt.bitget({'options': {
-                'defaultType': 'future'
+                'defaultType': 'swap'
             }})
         else:
             self.exchange = ccxt.binance({'options': {
