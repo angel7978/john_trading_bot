@@ -45,13 +45,13 @@ class MyInfo:
                 }
             })
 
-        self.exchange.load_markets()
+            for symbol in chains:
+                self.exchange.fapiPrivate_post_leverage({
+                    'symbol': symbol,
+                    'leverage': self.leverage,
+                })
 
-        for symbol in chains:
-            self.exchange.fapiPrivate_post_leverage({
-                'symbol': symbol,
-                'leverage': self.leverage,
-            })
+        self.exchange.load_markets()
 
     def getBalance(self, symbol):
         ret = self.exchange.fetch_balance()
