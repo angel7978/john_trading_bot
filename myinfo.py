@@ -30,6 +30,7 @@ class MyInfo:
             self.exchange = ccxt.bitget({
                 'apiKey': self.access_key,
                 'secret': self.secret_key,
+                'password': self.secret_key,
                 'enableRateLimit': True,
                 'options': {
                     'defaultType': 'swap'
