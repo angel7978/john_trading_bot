@@ -15,6 +15,7 @@ class MyInfo:
     leverage = 5
     exchange_str = 'binance'
     title = ''
+    password = ''
 
     def __init__(self, config_file_name, chains):
         with open(config_file_name) as json_file:
@@ -25,12 +26,13 @@ class MyInfo:
             self.leverage = json_data["leverage"]
             self.exchange_str = json_data["exchange"]
             self.title = json_data['title']
+            self.password = json_data['password'] if 'password' in json_data else ''
 
         if self.exchange_str == 'bitget':
             self.exchange = ccxt.bitget({
                 'apiKey': self.access_key,
                 'secret': self.secret_key,
-                'password': self.secret_key,
+                'password': self.password,
                 'enableRateLimit': True,
                 'options': {
                     'defaultType': 'swap'
