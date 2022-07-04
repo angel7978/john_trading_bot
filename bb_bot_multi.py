@@ -595,5 +595,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-BotMulti(config_file_name).start(96*7)
+BotMulti(config_file_name).start()
 
