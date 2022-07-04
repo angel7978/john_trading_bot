@@ -13,6 +13,36 @@ import numpy as np
 class OrderBook:
     exchange = None
 
+    simulate_const = {
+        '15m': {
+            'candle_thres': 900000
+        },
+        '30m': {
+            'candle_thres': 1800000
+        },
+        '1h': {
+            'candle_thres': 3600000
+        },
+        '2h': {
+            'candle_thres': 7200000
+        },
+        '4h': {
+            'candle_thres': 14400000
+        },
+        '6h': {
+            'candle_thres': 21600000
+        },
+        '8h': {
+            'candle_thres': 28800000
+        },
+        '12h': {
+            'candle_thres': 43200000
+        },
+        '1d': {
+            'candle_thres': 86400000
+        }
+    }
+
     def __init__(self):
         self.exchange = ccxt.binance({'options': {
             'defaultType': 'future'
@@ -35,7 +65,10 @@ class OrderBook:
         )
 
         df = pd.DataFrame(data=btc, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
-        df = df.iloc[:-1, :]
+
+        ms = time.time() * 1000.0
+        if timeframe == '1d' or ms - self.simulate_const[timeframe]['candle_thres'] < df.iloc[-1, 0]:
+            df = df.iloc[:-1, :]
 
         df['date'] = pd.to_datetime(df['datetime'], unit='ms')
         if timeframe != '1d':
