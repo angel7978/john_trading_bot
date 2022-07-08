@@ -20,6 +20,24 @@ class Bot(metaclass=ABCMeta):
         'free': 0.0
     }
     positions_data = [
+        {
+            "symbol": "BTCUSDT",
+            "amount_min": 0.1,
+            "sl_interval": "8h",
+            "interval": "30m"
+        },
+        {
+            "symbol": "ETHUSDT",
+            "amount_min": 0.01,
+            "sl_interval": "6h",
+            "interval": "30m"
+        },
+        {
+            "symbol": "BCHUSDT",
+            "amount_min": 0.01,
+            "sl_interval": "8h",
+            "interval": "30m"
+        }
     ]
     simulate_const = {
         '15m': {
@@ -62,14 +80,14 @@ class Bot(metaclass=ABCMeta):
     is_simulate = False
 
     def __init__(self, file_name):
-        with open('tickers.json') as json_file:
-            self.positions_data = json.load(json_file)
+        # with open('tickers.json') as json_file:
+        #     self.positions_data = json.load(json_file)
 
         self.info = myinfo.MyInfo(file_name, list(map(lambda d: d['symbol'], self.positions_data)))
         self.book = orderbook.OrderBook(self.info.exchange_str)
         self.telegram = telegram_module.Telegram(file_name)
 
-        title = self.info.title
+        self.title = self.info.title
 
         data_length = 0
         for data in self.positions_data:
@@ -80,9 +98,9 @@ class Bot(metaclass=ABCMeta):
             data_length = 1
             self.sendTelegramPush(self.title, '체인이 선택되지 않았습니다!! config 파일을 확인 해 주세요. [%s]' % self.info.using_symbol)
 
-        self.entry_amount_per = 0.2 / data_length
-        self.added_amount_per = 0.05 / data_length
-        self.stop_loss_threshold_total_per = 0.5 / data_length
+        self.entry_amount_per = 0.1
+        self.added_amount_per = 0.025
+        self.stop_loss_threshold_total_per = 0.25
         self.stop_loss_amount_per = 0.5
         self.close_position_threshold_bb_height = 0.80
 
@@ -159,6 +177,7 @@ class Bot(metaclass=ABCMeta):
             pnl = 0
 
             self.balance['total'] -= commission
+            data['commission'] -= commission
 
             if data['position'] is None:
                 data['position'] = 'Short'
@@ -176,9 +195,16 @@ class Bot(metaclass=ABCMeta):
             else:
                 if data['amount'] == amount:  # close
                     data['position'] = None
-                    data['amount'] = data['using'] = data['entry'] = data['commission'] = 0
+                    data['amount'] = data['using'] = data['entry'] = 0
 
                     pnl = gain_usdt_leverage - my_usdt_leverage
+
+                    if pnl > 0:
+                        data['win'] += 1
+                        data['profit'] += pnl
+                    else:
+                        data['lose'] += 1
+                        data['loss'] += pnl
                 else:  # s/l
                     pre_pnl = (price - data['entry']) * data['amount']
                     data['using'] -= amount * data['entry'] / self.info.leverage
@@ -186,6 +212,7 @@ class Bot(metaclass=ABCMeta):
                     post_pnl = (price - data['entry']) * data['amount']
 
                     pnl = pre_pnl - post_pnl
+                    data['loss'] += pnl
             self.balance['total'] += pnl
             return pnl
         else:
@@ -219,8 +246,8 @@ class Bot(metaclass=ABCMeta):
             commission = using_usdt_leverage * 0.0004
             pnl = 0
 
-            self.balance['total'] += pnl
             self.balance['total'] -= commission
+            data['commission'] -= commission
 
             if data['position'] is None:
                 data['position'] = 'Long'
@@ -238,16 +265,24 @@ class Bot(metaclass=ABCMeta):
             else:
                 if data['amount'] == amount:  # close
                     data['position'] = None
-                    data['amount'] = data['using'] = data['entry'] = data['commission'] = 0
+                    data['amount'] = data['using'] = data['entry'] = 0
 
                     pnl = my_usdt_leverage - using_usdt_leverage
+
+                    if pnl > 0:
+                        data['win'] += 1
+                        data['profit'] += pnl
+                    else:
+                        data['lose'] += 1
+                        data['loss'] += pnl
                 else:  # s/l
                     pre_pnl = (price - data['entry']) * data['amount']
                     data['using'] -= amount * data['entry'] / self.info.leverage
                     data['amount'] -= amount
                     post_pnl = (price - data['entry']) * data['amount']
 
-                    pnl = pre_pnl - post_pnl
+                    pnl = post_pnl - pre_pnl
+                    data['loss'] += pnl
             self.balance['total'] += pnl
             return pnl
         else:
@@ -312,6 +347,11 @@ class Bot(metaclass=ABCMeta):
                 data['using'] = 0
                 data['entry'] = 0
                 data['pnl'] = 0
+                data['win'] = 0
+                data['lose'] = 0
+                data['profit'] = 0
+                data['loss'] = 0
+                data['commission'] = 0
             self.updatePositions(data)
             if data['position'] is not None or data['enabled']:
                 print('    [%s] Position (%s), Size (%.4f USDT)' % (data['symbol'], data['position'], data['using']))
@@ -480,6 +520,16 @@ class Bot(metaclass=ABCMeta):
                     self.makeBuyOrder(data, data['amount'], candle_now['bb_l'], candle_now, candle_prev)
 
             candle_count += 1
+
+        if self.is_simulate:
+            for data in self.positions_data:
+                if not data['enabled']:
+                    continue
+
+                total_tx = data['win'] + data['lose']
+                print('[%s] Summery : Win rate (%d / %d, %.4f%%), Total profit (%.4f USDT), Avg profit (%.4f USDT), Total loss (%.4f USDT), Avg loss (%.4f USDT), Commission (%.4f USDT), Total PnL (%.4f USDT, %.4f%%)' % (data['symbol'], data['win'], total_tx, (data['win'] * 100) / total_tx, data['profit'], data['profit'] / data['win'], data['loss'], data['loss'] / data['lose'], data['commission'], data['profit'] + data['loss'], (data['profit'] + data['loss']) / 10))
+
+            print('Total (%.4f USDT), Total PnL (%.4f%%)' % (self.balance['total'], (self.balance['total'] - 1000) / 10))
 
     @staticmethod
     def floor(num):

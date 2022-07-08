@@ -62,14 +62,32 @@ class OrderBook:
         return ret
 
     def generate_chart_data(self, symbol, timeframe='30m', limit=100):
-        btc = self.exchange.fetch_ohlcv(
-            symbol=symbol,
-            timeframe=timeframe,
-            since=None,
-            limit=limit
-        )
+        df = pd.DataFrame(data=None, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
 
-        df = pd.DataFrame(data=btc, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
+        since = int(time.time() * 1000)
+        least = limit
+        load = limit
+        while True:
+            if least > 1500:
+                since -= 1500 * self.simulate_const[timeframe]['candle_thres']
+                least -= 1500
+                load = 1500
+            else:
+                since -= least * self.simulate_const[timeframe]['candle_thres']
+                load = least
+                least = 0
+
+            btc = self.exchange.fetch_ohlcv(
+                symbol=symbol,
+                timeframe=timeframe,
+                since=since,
+                limit=load
+            )
+
+            df = pd.concat([pd.DataFrame(data=btc, columns=['datetime', 'open', 'high', 'low', 'close', 'volume']), df])
+
+            if least == 0:
+                break
 
         ms = time.time() * 1000.0
         if timeframe == '1d' or ms - self.simulate_const[timeframe]['candle_thres'] < df.iloc[-1, 0]:
