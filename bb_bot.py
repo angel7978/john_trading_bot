@@ -15,6 +15,7 @@ from abc import *
 
 class Bot(metaclass=ABCMeta):
     title = 'BB Bot'
+    using_pnl_shortcut = True
     balance = {
         'total': 0.0,
         'free': 0.0
@@ -23,7 +24,7 @@ class Bot(metaclass=ABCMeta):
         {
             "symbol": "BTCUSDT",
             "amount_min": 0.1,
-            "sl_interval": "8h",
+            "sl_interval": "12h",
             "interval": "30m"
         },
         {
@@ -195,7 +196,7 @@ class Bot(metaclass=ABCMeta):
             else:
                 if data['amount'] == amount:  # close
                     data['position'] = None
-                    data['amount'] = data['using'] = data['entry'] = 0
+                    data['amount'] = data['using'] = data['entry'] = data['pnl'] = 0
 
                     pnl = gain_usdt_leverage - my_usdt_leverage
 
@@ -265,7 +266,7 @@ class Bot(metaclass=ABCMeta):
             else:
                 if data['amount'] == amount:  # close
                     data['position'] = None
-                    data['amount'] = data['using'] = data['entry'] = 0
+                    data['amount'] = data['using'] = data['entry'] = data['pnl'] = 0
 
                     pnl = my_usdt_leverage - using_usdt_leverage
 
@@ -312,6 +313,28 @@ class Bot(metaclass=ABCMeta):
         time.sleep(waiting_time_sec)
 
     @staticmethod
+    def getExpectedPnL(data, passed_len, price, amount, close_price, close_price_inc, is_long=True):
+        expected_pnl_list = []
+        first = True
+        for item in data['closing_length']:
+            expected_pnl_list.append({
+                'length': item['length'],
+                'rate': 0 if item['length'] < passed_len else (item['ac_rate'] if first else item['rate']),
+                'expected_pnl': 0 if item['length'] < passed_len else ((close_price + close_price_inc * (item['length'] - passed_len) * pow(0.9, item['length'] - passed_len)) - price) * amount * (1 if is_long else -1)
+            })
+
+            if item['length'] >= passed_len:
+                first = False
+
+        expected_pnl = 0
+        for item in expected_pnl_list:
+            expected_pnl += item['rate'] * item['expected_pnl']
+
+        # print('%.4f, %.4f, %.4f, %.4f' % (price, amount, close_price, close_price_inc))
+        # print('  expected pnl = %.4f, unrealized pnl = %.4f, raw = %s' % (expected_pnl, data['pnl'], expected_pnl_list))
+        return expected_pnl
+
+    @staticmethod
     def createCandle(record):
         return {
             'datetime': record['datetime'],
@@ -323,7 +346,8 @@ class Bot(metaclass=ABCMeta):
             'bb_h': record['bb_bbh'],
             'bb_m': record['bb_bbm'],
             'bb_l': record['bb_bbl'],
-            'rsi': record['rsi']
+            'rsi': record['rsi'],
+            'volume': record['volume']
         }
 
     def sendTelegramPush(self, *msgs):
@@ -387,6 +411,8 @@ class Bot(metaclass=ABCMeta):
                     if (candle_count + bonus_candle_count) % self.simulate_const[data['interval']]['simulate_candle_div'] != 0:
                         continue
                     candle_idx = int((-simulate + candle_count) / self.simulate_const[data['interval']]['simulate_candle_div'])
+                    if candle_idx >= 0:
+                        continue
                     candle_prev = self.createCandle(data['df_interval'].iloc[candle_idx - 1])
                     candle_now = self.createCandle(data['df_interval'].iloc[candle_idx])
                     candle_sl = self.createCandle(data['df_sl_interval'].loc[data['df_sl_interval']['datetime'] <= candle_now['datetime'] - self.simulate_const[data['sl_interval']]['candle_offset']].iloc[-1])
@@ -412,6 +438,8 @@ class Bot(metaclass=ABCMeta):
 
                     if data['position'] == 'Long':
                         price = candle_now['close'] + data['amount_min']
+                        if self.is_simulate:
+                            data['pnl'] = (price - data['entry']) * data['amount']
 
                         # 종료 체크
                         now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
@@ -453,6 +481,8 @@ class Bot(metaclass=ABCMeta):
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 손절 - Size (%.4f USDT)' % gain_usdt, 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
                     else:
                         price = candle_now['close'] - data['amount_min']
+                        if self.is_simulate:
+                            data['pnl'] = (data['entry'] - price) * data['amount']
 
                         # 종료 체크
                         now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
@@ -501,14 +531,16 @@ class Bot(metaclass=ABCMeta):
 
                     if candle_sl['low'] >= candle_sl['bb_l'] and candle_now['close'] < candle_now['bb_l']:
                         price = candle_now['close'] + data['amount_min']
-                        self.buyOrder(data, using_usdt * self.info.leverage / price, price)
+                        amount = using_usdt * self.info.leverage / price
+                        self.buyOrder(data, amount, price)
 
                         print('%s [%s] Long Entry - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 진입 - Size (%.4f USDT / %.4f USDT)' % (using_usdt, self.balance['total']))
 
                     elif candle_sl['high'] <= candle_sl['bb_h'] and candle_now['close'] > candle_now['bb_h']:
                         price = candle_now['close'] - data['amount_min']
-                        self.sellOrder(data, using_usdt * self.info.leverage / price, price)
+                        amount = using_usdt * self.info.leverage / price
+                        self.sellOrder(data, amount, price)
 
                         print('%s [%s] Short Entry - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 진입 - Size (%.4f USDT / %.4f USDT)' % (using_usdt, self.balance['total']))
@@ -525,9 +557,36 @@ class Bot(metaclass=ABCMeta):
             for data in self.positions_data:
                 if not data['enabled']:
                     continue
+                if data['position'] is not None:
+                    print('[%s] unrealized pnl %.4f' % (data['symbol'], data['pnl']))
 
                 total_tx = data['win'] + data['lose']
                 print('[%s] Summery : Win rate (%d / %d, %.4f%%), Total profit (%.4f USDT), Avg profit (%.4f USDT), Total loss (%.4f USDT), Avg loss (%.4f USDT), Commission (%.4f USDT), Total PnL (%.4f USDT, %.4f%%)' % (data['symbol'], data['win'], total_tx, (data['win'] * 100) / total_tx, data['profit'], data['profit'] / data['win'], data['loss'], data['loss'] / data['lose'], data['commission'], data['profit'] + data['loss'], (data['profit'] + data['loss']) / 10))
+
+                if False and not self.using_pnl_shortcut:
+                    closing_rate_data = []
+                    for i in range(24):
+                        closing_rate_data.append({
+                            'length': i * 4 + 4,
+                            'value': 0,
+                            'rate': 0.0,
+                            'ac_rate': 0.0
+                        })
+                    total = 0
+                    for item in sorted(data['closing_length'].items(), key=lambda it: it[0]):
+                        idx = int(item[0] / 4)
+                        if idx > 23:
+                            idx = 23
+                        closing_rate_data[idx]['value'] += item[1]
+                        total += item[1]
+                    for i in range(24):
+                        closing_rate_data[i]['rate'] = closing_rate_data[i]['value'] / total
+                        if i == 0:
+                            closing_rate_data[i]['ac_rate'] = closing_rate_data[i]['rate']
+                        else:
+                            closing_rate_data[i]['ac_rate'] = closing_rate_data[i - 1]['ac_rate'] + closing_rate_data[i]['rate']
+
+                    print('    Closing length : %s' % closing_rate_data)
 
             print('Total (%.4f USDT), Total PnL (%.4f%%)' % (self.balance['total'], (self.balance['total'] - 1000) / 10))
 
