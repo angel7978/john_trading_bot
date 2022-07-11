@@ -16,6 +16,7 @@ from abc import *
 class Bot(metaclass=ABCMeta):
     title = 'BB Bot'
     using_pnl_shortcut = True
+    simulation_usdt = 5000
     balance = {
         'total': 0.0,
         'free': 0.0
@@ -24,20 +25,24 @@ class Bot(metaclass=ABCMeta):
         {
             "symbol": "BTCUSDT",
             "amount_min": 0.1,
-            "sl_interval": "12h",
-            "interval": "30m"
+            "sl_interval": "8h",
+            "interval": "30m",
+            "closing_rate": [{'length': 4, 'value': 44, 'rate': 0.08270676691729323, 'ac_rate': 0.08270676691729323}, {'length': 8, 'value': 62, 'rate': 0.11654135338345864, 'ac_rate': 0.19924812030075187}, {'length': 12, 'value': 72, 'rate': 0.13533834586466165, 'ac_rate': 0.33458646616541354}, {'length': 16, 'value': 57, 'rate': 0.10714285714285714, 'ac_rate': 0.4417293233082707}, {'length': 20, 'value': 77, 'rate': 0.14473684210526316, 'ac_rate': 0.5864661654135339}, {'length': 24, 'value': 47, 'rate': 0.08834586466165413, 'ac_rate': 0.6748120300751881}, {'length': 28, 'value': 42, 'rate': 0.07894736842105263, 'ac_rate': 0.7537593984962407}, {'length': 32, 'value': 38, 'rate': 0.07142857142857142, 'ac_rate': 0.8251879699248121}, {'length': 36, 'value': 25, 'rate': 0.046992481203007516, 'ac_rate': 0.8721804511278196}, {'length': 40, 'value': 19, 'rate': 0.03571428571428571, 'ac_rate': 0.9078947368421053}, {'length': 44, 'value': 17, 'rate': 0.03195488721804511, 'ac_rate': 0.9398496240601504}, {'length': 48, 'value': 11, 'rate': 0.020676691729323307, 'ac_rate': 0.9605263157894737}, {'length': 52, 'value': 6, 'rate': 0.011278195488721804, 'ac_rate': 0.9718045112781954}, {'length': 56, 'value': 4, 'rate': 0.007518796992481203, 'ac_rate': 0.9793233082706767}, {'length': 60, 'value': 2, 'rate': 0.0037593984962406013, 'ac_rate': 0.9830827067669173}, {'length': 64, 'value': 4, 'rate': 0.007518796992481203, 'ac_rate': 0.9906015037593985}, {'length': 68, 'value': 1, 'rate': 0.0018796992481203006, 'ac_rate': 0.9924812030075187}, {'length': 72, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9924812030075187}, {'length': 76, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9924812030075187}, {'length': 80, 'value': 1, 'rate': 0.0018796992481203006, 'ac_rate': 0.994360902255639}, {'length': 84, 'value': 2, 'rate': 0.0037593984962406013, 'ac_rate': 0.9981203007518796}, {'length': 88, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9981203007518796}, {'length': 92, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9981203007518796}, {'length': 96, 'value': 1, 'rate': 0.0018796992481203006, 'ac_rate': 0.9999999999999999}]
+
         },
         {
             "symbol": "ETHUSDT",
             "amount_min": 0.01,
             "sl_interval": "6h",
-            "interval": "30m"
+            "interval": "30m",
+            "closing_rate": [{'length': 4, 'value': 27, 'rate': 0.04981549815498155, 'ac_rate': 0.04981549815498155}, {'length': 8, 'value': 74, 'rate': 0.13653136531365315, 'ac_rate': 0.1863468634686347}, {'length': 12, 'value': 80, 'rate': 0.14760147601476015, 'ac_rate': 0.33394833948339486}, {'length': 16, 'value': 72, 'rate': 0.13284132841328414, 'ac_rate': 0.466789667896679}, {'length': 20, 'value': 74, 'rate': 0.13653136531365315, 'ac_rate': 0.6033210332103321}, {'length': 24, 'value': 49, 'rate': 0.09040590405904059, 'ac_rate': 0.6937269372693727}, {'length': 28, 'value': 40, 'rate': 0.07380073800738007, 'ac_rate': 0.7675276752767528}, {'length': 32, 'value': 37, 'rate': 0.06826568265682657, 'ac_rate': 0.8357933579335793}, {'length': 36, 'value': 25, 'rate': 0.046125461254612546, 'ac_rate': 0.8819188191881919}, {'length': 40, 'value': 20, 'rate': 0.03690036900369004, 'ac_rate': 0.9188191881918819}, {'length': 44, 'value': 14, 'rate': 0.025830258302583026, 'ac_rate': 0.9446494464944649}, {'length': 48, 'value': 9, 'rate': 0.016605166051660517, 'ac_rate': 0.9612546125461254}, {'length': 52, 'value': 6, 'rate': 0.01107011070110701, 'ac_rate': 0.9723247232472324}, {'length': 56, 'value': 4, 'rate': 0.007380073800738007, 'ac_rate': 0.9797047970479704}, {'length': 60, 'value': 3, 'rate': 0.005535055350553505, 'ac_rate': 0.985239852398524}, {'length': 64, 'value': 1, 'rate': 0.0018450184501845018, 'ac_rate': 0.9870848708487084}, {'length': 68, 'value': 4, 'rate': 0.007380073800738007, 'ac_rate': 0.9944649446494465}, {'length': 72, 'value': 1, 'rate': 0.0018450184501845018, 'ac_rate': 0.9963099630996309}, {'length': 76, 'value': 1, 'rate': 0.0018450184501845018, 'ac_rate': 0.9981549815498154}, {'length': 80, 'value': 1, 'rate': 0.0018450184501845018, 'ac_rate': 0.9999999999999999}, {'length': 84, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9999999999999999}, {'length': 88, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9999999999999999}, {'length': 92, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9999999999999999}, {'length': 96, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9999999999999999}]
         },
         {
             "symbol": "BCHUSDT",
             "amount_min": 0.01,
             "sl_interval": "8h",
-            "interval": "30m"
+            "interval": "30m",
+            "closing_rate": [{'length': 4, 'value': 27, 'rate': 0.0533596837944664, 'ac_rate': 0.0533596837944664}, {'length': 8, 'value': 58, 'rate': 0.11462450592885376, 'ac_rate': 0.16798418972332016}, {'length': 12, 'value': 72, 'rate': 0.1422924901185771, 'ac_rate': 0.3102766798418972}, {'length': 16, 'value': 70, 'rate': 0.1383399209486166, 'ac_rate': 0.4486166007905138}, {'length': 20, 'value': 79, 'rate': 0.15612648221343872, 'ac_rate': 0.6047430830039525}, {'length': 24, 'value': 54, 'rate': 0.1067193675889328, 'ac_rate': 0.7114624505928853}, {'length': 28, 'value': 50, 'rate': 0.09881422924901186, 'ac_rate': 0.8102766798418971}, {'length': 32, 'value': 15, 'rate': 0.029644268774703556, 'ac_rate': 0.8399209486166007}, {'length': 36, 'value': 24, 'rate': 0.04743083003952569, 'ac_rate': 0.8873517786561264}, {'length': 40, 'value': 17, 'rate': 0.03359683794466403, 'ac_rate': 0.9209486166007904}, {'length': 44, 'value': 9, 'rate': 0.017786561264822136, 'ac_rate': 0.9387351778656126}, {'length': 48, 'value': 8, 'rate': 0.015810276679841896, 'ac_rate': 0.9545454545454545}, {'length': 52, 'value': 6, 'rate': 0.011857707509881422, 'ac_rate': 0.9664031620553359}, {'length': 56, 'value': 6, 'rate': 0.011857707509881422, 'ac_rate': 0.9782608695652174}, {'length': 60, 'value': 1, 'rate': 0.001976284584980237, 'ac_rate': 0.9802371541501976}, {'length': 64, 'value': 3, 'rate': 0.005928853754940711, 'ac_rate': 0.9861660079051383}, {'length': 68, 'value': 5, 'rate': 0.009881422924901186, 'ac_rate': 0.9960474308300395}, {'length': 72, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9960474308300395}, {'length': 76, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9960474308300395}, {'length': 80, 'value': 1, 'rate': 0.001976284584980237, 'ac_rate': 0.9980237154150198}, {'length': 84, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9980237154150198}, {'length': 88, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9980237154150198}, {'length': 92, 'value': 1, 'rate': 0.001976284584980237, 'ac_rate': 1.0}, {'length': 96, 'value': 0, 'rate': 0.0, 'ac_rate': 1.0}]
         }
     ]
     simulate_const = {
@@ -108,7 +113,7 @@ class Bot(metaclass=ABCMeta):
     def updateBalance(self):
         if self.is_simulate:
             if self.balance['total'] == 0:
-                self.balance['total'] = self.balance['free'] = 1000.0
+                self.balance['total'] = self.balance['free'] = self.simulation_usdt
         else:
             balance = self.info.getBalance('USDT')
             self.balance['free'] = balance[0]
@@ -196,7 +201,10 @@ class Bot(metaclass=ABCMeta):
             else:
                 if data['amount'] == amount:  # close
                     data['position'] = None
-                    data['amount'] = data['using'] = data['entry'] = data['pnl'] = 0
+                    if data['position_length'] not in data['closing_length']:
+                        data['closing_length'][data['position_length']] = 0
+                    data['closing_length'][data['position_length']] += 1
+                    data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['position_length'] = data['up'] = data['down'] = 0
 
                     pnl = gain_usdt_leverage - my_usdt_leverage
 
@@ -266,7 +274,10 @@ class Bot(metaclass=ABCMeta):
             else:
                 if data['amount'] == amount:  # close
                     data['position'] = None
-                    data['amount'] = data['using'] = data['entry'] = data['pnl'] = 0
+                    if data['position_length'] not in data['closing_length']:
+                        data['closing_length'][data['position_length']] = 0
+                    data['closing_length'][data['position_length']] += 1
+                    data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['position_length'] = data['up'] = data['down'] = 0
 
                     pnl = my_usdt_leverage - using_usdt_leverage
 
@@ -313,18 +324,14 @@ class Bot(metaclass=ABCMeta):
         time.sleep(waiting_time_sec)
 
     @staticmethod
-    def getExpectedPnL(data, passed_len, price, amount, close_price, close_price_inc, is_long=True):
+    def getExpectedPnL(data, price, amount, close_price, close_price_inc, is_long=True):
         expected_pnl_list = []
-        first = True
-        for item in data['closing_length']:
+        for item in data['closing_rate']:
             expected_pnl_list.append({
                 'length': item['length'],
-                'rate': 0 if item['length'] < passed_len else (item['ac_rate'] if first else item['rate']),
-                'expected_pnl': 0 if item['length'] < passed_len else ((close_price + close_price_inc * (item['length'] - passed_len) * pow(0.9, item['length'] - passed_len)) - price) * amount * (1 if is_long else -1)
+                'rate': item['rate'],
+                'expected_pnl': ((close_price + close_price_inc * item['length'] ) - price) * amount * (1 if is_long else -1) #  * pow(0.9, item['length'])
             })
-
-            if item['length'] >= passed_len:
-                first = False
 
         expected_pnl = 0
         for item in expected_pnl_list:
@@ -367,15 +374,8 @@ class Bot(metaclass=ABCMeta):
         for data in self.positions_data:
             if self.is_simulate:
                 data['position'] = None
-                data['amount'] = 0
-                data['using'] = 0
-                data['entry'] = 0
-                data['pnl'] = 0
-                data['win'] = 0
-                data['lose'] = 0
-                data['profit'] = 0
-                data['loss'] = 0
-                data['commission'] = 0
+                data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['win'] = data['lose'] = data['profit'] = data['loss'] = data['commission'] = data['position_length'] = data['up'] = data['down'] = 0
+                data['closing_length'] = {}
             self.updatePositions(data)
             if data['position'] is not None or data['enabled']:
                 print('    [%s] Position (%s), Size (%.4f USDT)' % (data['symbol'], data['position'], data['using']))
@@ -434,7 +434,13 @@ class Bot(metaclass=ABCMeta):
                     print(candle_now)
 
                 if data['position'] is not None:
+                    data['position_length'] += 1
                     using_usdt = 0
+
+                    if candle_now['open'] < candle_now['close']:
+                        data['up'] += 1
+                    else:
+                        data['down'] += 1
 
                     if data['position'] == 'Long':
                         price = candle_now['close'] + data['amount_min']
@@ -442,7 +448,7 @@ class Bot(metaclass=ABCMeta):
                             data['pnl'] = (price - data['entry']) * data['amount']
 
                         # 종료 체크
-                        now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
+                        now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * (self.close_position_threshold_bb_height + 0.00 * (data['up'] - data['down']))
                         if now_clearing_price < candle_now['close'] or candle_sl['low'] < candle_sl['bb_l']:
                             using_usdt = data['amount'] * data['entry'] / self.info.leverage
                             gain_usdt = data['amount'] * price / self.info.leverage
@@ -485,7 +491,7 @@ class Bot(metaclass=ABCMeta):
                             data['pnl'] = (data['entry'] - price) * data['amount']
 
                         # 종료 체크
-                        now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
+                        now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * (self.close_position_threshold_bb_height + 0.00 * (data['up'] - data['down']))
                         if now_clearing_price > candle_now['close'] or candle_sl['high'] > candle_sl['bb_h']:
                             gain_usdt = data['amount'] * data['entry'] / self.info.leverage
                             using_usdt = data['amount'] * price / self.info.leverage
@@ -559,11 +565,12 @@ class Bot(metaclass=ABCMeta):
                     continue
                 if data['position'] is not None:
                     print('[%s] unrealized pnl %.4f' % (data['symbol'], data['pnl']))
+                    self.balance['total'] += data['pnl']
 
                 total_tx = data['win'] + data['lose']
-                print('[%s] Summery : Win rate (%d / %d, %.4f%%), Total profit (%.4f USDT), Avg profit (%.4f USDT), Total loss (%.4f USDT), Avg loss (%.4f USDT), Commission (%.4f USDT), Total PnL (%.4f USDT, %.4f%%)' % (data['symbol'], data['win'], total_tx, (data['win'] * 100) / total_tx, data['profit'], data['profit'] / data['win'], data['loss'], data['loss'] / data['lose'], data['commission'], data['profit'] + data['loss'], (data['profit'] + data['loss']) / 10))
+                print('[%s] Summery : Win rate (%d / %d, %.4f%%), Total profit (%.4f USDT), Avg profit (%.4f USDT), Total loss (%.4f USDT), Avg loss (%.4f USDT), Commission (%.4f USDT), Total PnL (%.4f USDT, %.4f%%)' % (data['symbol'], data['win'], total_tx, (data['win'] * 100) / total_tx, data['profit'], 0 if data['win'] == 0 else data['profit'] / data['win'], data['loss'], 0 if data['lose'] == 0 else data['loss'] / data['lose'], data['commission'], data['profit'] + data['loss'], (data['profit'] + data['loss']) * 100 / self.simulation_usdt))
 
-                if False and not self.using_pnl_shortcut:
+                if not self.using_pnl_shortcut:
                     closing_rate_data = []
                     for i in range(24):
                         closing_rate_data.append({
@@ -588,7 +595,7 @@ class Bot(metaclass=ABCMeta):
 
                     print('    Closing length : %s' % closing_rate_data)
 
-            print('Total (%.4f USDT), Total PnL (%.4f%%)' % (self.balance['total'], (self.balance['total'] - 1000) / 10))
+            print('Total (%.4f USDT), Total PnL (%.4f%%)' % (self.balance['total'], (self.balance['total'] - self.simulation_usdt) * 100 / self.simulation_usdt))
 
     @staticmethod
     def floor(num):
@@ -600,5 +607,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(96*7)
 

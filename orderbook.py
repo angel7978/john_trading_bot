@@ -46,7 +46,7 @@ class OrderBook:
     def __init__(self, exchange_str):
         if exchange_str == 'bitget':
             self.exchange = ccxt.bitget({'options': {
-                'defaultType': 'swap'
+                'defaultType': 'spot'
             }})
         else:
             self.exchange = ccxt.binance({'options': {
@@ -58,6 +58,7 @@ class OrderBook:
         return ret
 
     def fetch_tickers(self):
+        print(self.exchange.fetch_tickers())
         ret = list(map(lambda ticker: ticker.replace('/', ''), filter(lambda ticker: 'USDT' in ticker, self.exchange.fetch_tickers().keys())))
         return ret
 
