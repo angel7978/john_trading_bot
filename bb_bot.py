@@ -374,10 +374,9 @@ class Bot(metaclass=ABCMeta):
         self.sendTelegramPush(self.title, 'Bot start!', 'Free (%.4f USDT), Total (%.4f USDT)' % (self.balance['free'], self.balance['total']))
 
         for data in self.positions_data:
-            if self.is_simulate:
-                data['position'] = None
-                data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['win'] = data['lose'] = data['profit'] = data['loss'] = data['commission'] = data['position_length'] = data['up'] = data['down'] = 0
-                data['closing_length'] = {}
+            data['position'] = None
+            data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['win'] = data['lose'] = data['profit'] = data['loss'] = data['commission'] = data['position_length'] = data['up'] = data['down'] = 0
+            data['closing_length'] = {}
             self.updatePositions(data)
             if data['position'] is not None or data['enabled']:
                 print('    [%s] Position (%s), Size (%.4f USDT)' % (data['symbol'], data['position'], data['using']))
@@ -647,5 +646,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(96*365)
 
