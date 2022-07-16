@@ -107,6 +107,13 @@ class OrderBook:
         df['bb_bbh'] = indicator_bb.bollinger_hband()
         df['bb_bbl'] = indicator_bb.bollinger_lband()
 
+        volume_bb = BollingerBands(close=df["volume"], window=100, window_dev=1)
+
+        # Add Bollinger Bands features
+        df['bb_vm'] = volume_bb.bollinger_mavg()
+        df['bb_vh'] = volume_bb.bollinger_hband()
+        df['bb_vl'] = volume_bb.bollinger_lband()
+
         indicator_rsi = RSIIndicator(close=df["close"], window=14)
         df['rsi'] = indicator_rsi.rsi()
 
