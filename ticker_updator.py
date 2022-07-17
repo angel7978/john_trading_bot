@@ -31,13 +31,22 @@ class TickerUpdator(metaclass=ABCMeta):
 
     def __init__(self, file_name):
         self.info = myinfo.MyInfo(file_name, [])
-        self.book = orderbook.OrderBook()
+        self.book = orderbook.OrderBook('binance')
 
+        self.taker_commission = 0.0004
         self.entry_amount_per = 0.2
         self.added_amount_per = 0.05
         self.stop_loss_threshold_total_per = 0.5
         self.stop_loss_amount_per = 0.5
         self.close_position_threshold_bb_height = 0.80
+        self.chasing_target_profit = 0.01
+        self.chasing_maximum_total_per = 0.1
+        self.forced_close_min_length = 12
+        self.forced_close_bb_length_thres_per = 0.015
+
+    def checkSellOrderForSimulation(self, data, amount, price, date):
+        gain_usdt = amount * price / self.info.leverage
+        pnl = self.sellOrder(data, amount, price)
 
     def makeSellOrder(self, data, amount, price, candle_now, candle_prev):
         if candle_now['high'] >= candle_prev['bb_h']:
@@ -47,10 +56,11 @@ class TickerUpdator(metaclass=ABCMeta):
     def sellOrder(self, data, amount, price):
         gain_usdt_leverage = price * amount
         my_usdt_leverage = data['entry'] * data['amount']
-        commission = gain_usdt_leverage * 0.0004
+        commission = gain_usdt_leverage * self.taker_commission
         pnl = 0
 
         self.balance['total'] -= commission
+        data['commission'] -= commission
 
         if data['position'] is None:
             data['position'] = 'Short'
@@ -68,9 +78,19 @@ class TickerUpdator(metaclass=ABCMeta):
         else:
             if data['amount'] == amount:  # close
                 data['position'] = None
-                data['amount'] = data['using'] = data['entry'] = data['commission'] = 0
+                if data['position_length'] not in data['closing_length']:
+                    data['closing_length'][data['position_length']] = 0
+                data['closing_length'][data['position_length']] += 1
+                data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['position_length'] = data['tp_price'] = data['tp_price_best'] = data['chasing_amount'] = data['chasing_remain'] = 0
 
                 pnl = gain_usdt_leverage - my_usdt_leverage
+
+                if pnl > 0:
+                    data['win'] += 1
+                    data['profit'] += pnl
+                else:
+                    data['lose'] += 1
+                    data['loss'] += pnl
             else:  # s/l
                 pre_pnl = (price - data['entry']) * data['amount']
                 data['using'] -= amount * data['entry'] / self.info.leverage
@@ -78,8 +98,14 @@ class TickerUpdator(metaclass=ABCMeta):
                 post_pnl = (price - data['entry']) * data['amount']
 
                 pnl = pre_pnl - post_pnl
+                data['loss'] += pnl
         self.balance['total'] += pnl
         return pnl
+
+    def checkBuyOrderForSimulation(self, data, amount, price, date):
+        if self.is_simulate:
+            using_usdt = amount * price / self.info.leverage
+            pnl = self.buyOrder(data, amount, price)
 
     def makeBuyOrder(self, data, amount, price, candle_now, candle_prev):
         if candle_now['low'] <= candle_prev['bb_l']:
@@ -89,11 +115,11 @@ class TickerUpdator(metaclass=ABCMeta):
     def buyOrder(self, data, amount, price):
         using_usdt_leverage = price * amount
         my_usdt_leverage = data['entry'] * data['amount']
-        commission = using_usdt_leverage * 0.0004
+        commission = using_usdt_leverage * self.taker_commission
         pnl = 0
 
-        self.balance['total'] += pnl
         self.balance['total'] -= commission
+        data['commission'] -= commission
 
         if data['position'] is None:
             data['position'] = 'Long'
@@ -111,18 +137,51 @@ class TickerUpdator(metaclass=ABCMeta):
         else:
             if data['amount'] == amount:  # close
                 data['position'] = None
-                data['amount'] = data['using'] = data['entry'] = data['commission'] = 0
+                if data['position_length'] not in data['closing_length']:
+                    data['closing_length'][data['position_length']] = 0
+                data['closing_length'][data['position_length']] += 1
+                data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['position_length'] = data['tp_price'] = data['tp_price_best'] = data['chasing_amount'] = data['chasing_remain'] = 0
 
                 pnl = my_usdt_leverage - using_usdt_leverage
+
+                if pnl > 0:
+                    data['win'] += 1
+                    data['profit'] += pnl
+                else:
+                    data['lose'] += 1
+                    data['loss'] += pnl
             else:  # s/l
                 pre_pnl = (price - data['entry']) * data['amount']
                 data['using'] -= amount * data['entry'] / self.info.leverage
                 data['amount'] -= amount
                 post_pnl = (price - data['entry']) * data['amount']
 
-                pnl = pre_pnl - post_pnl
+                pnl = post_pnl - pre_pnl
+                data['loss'] += pnl
         self.balance['total'] += pnl
         return pnl
+
+    def runChasing(self, data, amount, close, date_for_simulation=''):
+        if data['chasing_amount'] == 0 or data['chasing_remain'] == 0 or data['position'] is None:
+            data['chasing_amount'] = data['chasing_remain'] = 0
+            return
+
+        amount *= 3
+        data['chasing_remain'] = 1
+
+        if data['position'] == 'Long':
+            # 물타기
+            price = close + data['amount_min']
+            self.buyOrder(data, amount, price)
+        elif data['position'] == 'Short':
+            # 물타기
+            price = close - data['amount_min']
+            self.sellOrder(data, amount, price)
+
+        data['chasing_remain'] -= 1
+
+        if data['chasing_remain'] == 0:
+            data['chasing_amount'] = 0
 
     @staticmethod
     def createCandle(record):
@@ -136,7 +195,10 @@ class TickerUpdator(metaclass=ABCMeta):
             'bb_h': record['bb_bbh'],
             'bb_m': record['bb_bbm'],
             'bb_l': record['bb_bbl'],
-            'rsi': record['rsi']
+            'rsi': record['rsi'],
+            'volume': record['volume'],
+            'bb_vm': record['bb_vm'],
+            'bb_vh': record['bb_vh']
         }
 
     def start(self, simulate=0):
@@ -147,7 +209,7 @@ class TickerUpdator(metaclass=ABCMeta):
         logs = ""
 
         for ticker in self.book.fetch_tickers():
-            data = {'symbol': ticker, 'quote': 0, 'position': None, 'amount': 0, 'using': 0, 'entry': 0, 'pnl': 0}
+            data = {'symbol': ticker, 'amount_min': 0, 'position': None, 'amount': 0, 'using': 0, 'entry': 0, 'pnl': 0}
             result = []
             self.position_data.append(data)
 
@@ -166,7 +228,8 @@ class TickerUpdator(metaclass=ABCMeta):
                     for sl_interval in sl_interval_arr:
                         self.balance['total'] = self.balance['free'] = 1000.0
                         data['position'] = None
-                        data['amount'] = data['using'] = data['entry'] = data['pnl'] = 0
+                        data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['win'] = data['lose'] = data['profit'] = data['loss'] = data['commission'] = data['position_length'] = data['chasing_amount'] = data['chasing_remain'] = data['tp_price'] = data['tp_price_best'] = 0
+                        data['closing_length'] = {}
 
                         interval_df = data['df_%s' % interval]
                         sl_df = data['df_%s' % sl_interval]
@@ -196,86 +259,142 @@ class TickerUpdator(metaclass=ABCMeta):
                             else:  # sl_interval == '1d':
                                 candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 54000000].iloc[-1])
 
-                            if data['position'] is not None:
-                                using_usdt = 0
+                            if data['position'] == 'Long' and data['tp_price'] != 0 and candle_now['low'] <= data['tp_price']:
+                                self.checkSellOrderForSimulation(data, data['amount'], data['tp_price'] - data['amount_min'], candle_now['date'])
+                            elif data['position'] == 'Short' and data['tp_price'] != 0 and candle_now['high'] >= data['tp_price']:
+                                self.checkBuyOrderForSimulation(data, data['amount'], data['tp_price'] + data['amount_min'], candle_now['date'])
 
-                                if data['position'] == 'Long':
-                                    price = candle_now['close'] + data['quote']
+                            if data['position'] == 'Long':
+                                price = candle_now['close'] + data['amount_min']
+                                if self.is_simulate:
+                                    data['pnl'] = (price - data['entry']) * data['amount']
 
-                                    # 종료 체크
-                                    now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
-                                    if now_clearing_price < candle_now['close'] or candle_sl['low'] < candle_sl['bb_l']:
-                                        using_usdt = data['amount'] * data['entry'] / self.info.leverage
+                                # 종료 체크
+                                now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
+                                low_bb = candle_sl['low'] < candle_sl['bb_l']
+                                forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
+                                if forced_close_by_bb or now_clearing_price < candle_now['close'] or low_bb or data['tp_price'] != 0:
+                                    pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
+                                    if pending_by_volume:
+                                        data['tp_price'] = now_clearing_price
+                                        data['tp_price_best'] = candle_now['close']
+
+                                    update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] < candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
+                                    if update_tp_price:
+                                        data['tp_price'] = data['tp_price_best']
+                                        data['tp_price_best'] = candle_now['close']
+
+                                    close_by_volume = data['tp_price'] != 0 and candle_now['volume'] <= candle_now['bb_vm']
+
+                                    if data['tp_price'] == 0 or close_by_volume:
+                                        reason = ''
+                                        if forced_close_by_bb:
+                                            reason = '(BB 폭이 좁아져 강제 종료)'
+                                        elif low_bb:
+                                            reason = '(이전 %s 캔들이 BB 하단 돌파)' % sl_interval
+                                        used_usdt = data['amount'] * data['entry'] / self.info.leverage
                                         gain_usdt = data['amount'] * price / self.info.leverage
                                         pnl = self.sellOrder(data, data['amount'], price)
-                                    else:
-                                        reason = ''
-                                        # 물타기 체크
-                                        if candle_now['open'] < candle_now['bb_l'] < candle_now['close']:
-                                            using_usdt += self.balance['total'] * self.added_amount_per
-                                            reason += 'B1'
-                                        elif candle_prev['open'] < candle_prev['close'] < candle_prev['bb_l'] and candle_now['bb_l'] < candle_now['open'] < candle_now['close']:
-                                            using_usdt += self.balance['total'] * self.added_amount_per
-                                            reason += 'B2'
-                                        if candle_prev['rsi'] < 30 < candle_now['rsi']:
-                                            using_usdt += self.balance['total'] * self.added_amount_per
-                                            reason += 'R'
-
-                                        if using_usdt > 0 and price < data['entry']:
-                                            # 물타기
-                                            self.buyOrder(data, using_usdt * self.info.leverage / price, price)
-                                        # 손절각일 경우 손절
-                                        if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per:
-                                            gain_usdt = data['amount'] * price * self.stop_loss_amount_per / self.info.leverage
-                                            pnl = self.sellOrder(data, data['amount'] * self.stop_loss_amount_per, price)
                                 else:
-                                    price = candle_now['close'] - data['quote']
+                                    chasing_reason = ''
+                                    # 물타기 체크
+                                    if candle_now['open'] < candle_now['bb_l'] < candle_now['close']:
+                                        chasing_reason += 'B1'
+                                    elif candle_prev['open'] < candle_prev['close'] < candle_prev['bb_l'] and candle_now['bb_l'] < candle_now['open'] < candle_now['close']:
+                                        chasing_reason += 'B2'
+                                    if candle_prev['rsi'] < 30 < candle_now['rsi']:
+                                        chasing_reason += 'R'
 
-                                    # 종료 체크
-                                    now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
-                                    if now_clearing_price > candle_now['close'] or candle_sl['high'] > candle_sl['bb_h']:
-                                        gain_usdt = data['amount'] * data['entry'] / self.info.leverage
+                                    if chasing_reason != '':
+                                        clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
+                                        if clearing_price < data['entry']:
+                                            # (평단가 * 현재 개수 + 지금 가격 * x개) * 101% = 정리 가격 * (현재 개수 + x개)
+                                            chasing_amount = (data['entry'] * (1 + self.chasing_target_profit) - clearing_price) * data['amount'] / (clearing_price - candle_now['close'] * (1 + self.chasing_target_profit))
+                                            # print('    Chasing Entry %.4f Amount %.4f Now %.4f Clear %.4f Chasing amount %.4f' % (data['entry'], data['amount'], candle_now['close'], clearing_price, chasing_amount))
+                                            if chasing_amount * candle_now['close'] > self.balance['total'] * self.chasing_maximum_total_per * self.info.leverage:
+                                                chasing_amount = self.balance['total'] * self.chasing_maximum_total_per / candle_now['close']
+                                                # print('    Chasing amount modified %.4f' % chasing_amount)
+                                                data['chasing_amount'] = chasing_amount if chasing_amount > 0 else 0
+                                                data['chasing_remain'] = 3 if chasing_amount > 0 else 0
+
+                                    # 손절각일 경우 손절
+                                    if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per:
+                                        gain_usdt = data['amount'] * price * self.stop_loss_amount_per / self.info.leverage
+                                        pnl = self.sellOrder(data, data['amount'] * self.stop_loss_amount_per, price)
+                            else:
+                                price = candle_now['close'] - data['amount_min']
+                                if self.is_simulate:
+                                    data['pnl'] = (data['entry'] - price) * data['amount']
+
+                                # 종료 체크
+                                now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
+                                high_bb = candle_sl['high'] > candle_sl['bb_h']
+                                forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
+                                if forced_close_by_bb or now_clearing_price > candle_now['close'] or high_bb or data['tp_price'] != 0:
+                                    pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
+                                    if pending_by_volume:
+                                        data['tp_price'] = now_clearing_price
+                                        data['tp_price_best'] = candle_now['close']
+
+                                    update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] > candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
+                                    if update_tp_price:
+                                        data['tp_price'] = data['tp_price_best']
+                                        data['tp_price_best'] = candle_now['close']
+
+                                    close_by_volume = data['tp_price'] != 0 and candle_now['volume'] <= candle_now['bb_vm']
+
+                                    if data['tp_price'] == 0 or close_by_volume:
+                                        reason = ''
+                                        if forced_close_by_bb:
+                                            reason = '(BB 폭이 좁아져 강제 종료)'
+                                        elif high_bb:
+                                            reason = '(이전 %s 캔들이 BB 상단 돌파)' % sl_interval
+
+                                        gained_usdt = data['amount'] * data['entry'] / self.info.leverage
                                         using_usdt = data['amount'] * price / self.info.leverage
                                         pnl = self.buyOrder(data, data['amount'], price)
-                                    else:
-                                        reason = ''
-                                        # 물타기 체크
-                                        if candle_now['open'] > candle_now['bb_h'] > candle_now['close']:
-                                            using_usdt += self.balance['total'] * self.added_amount_per
-                                            reason += 'B1'
-                                        elif candle_prev['open'] > candle_prev['close'] > candle_prev['bb_h'] and candle_now['bb_h'] > candle_now['open'] > candle_now['close']:
-                                            using_usdt += self.balance['total'] * self.added_amount_per
-                                            reason += 'B2'
-                                        if candle_prev['rsi'] > 70 > candle_now['rsi']:
-                                            using_usdt += self.balance['total'] * self.added_amount_per
-                                            reason += 'R'
+                                else:
+                                    chasing_reason = ''
+                                    # 물타기 체크
+                                    if candle_now['open'] > candle_now['bb_h'] > candle_now['close']:
+                                        chasing_reason += 'B1'
+                                    elif candle_prev['open'] > candle_prev['close'] > candle_prev['bb_h'] and candle_now['bb_h'] > candle_now['open'] > candle_now['close']:
+                                        chasing_reason += 'B2'
+                                    if candle_prev['rsi'] > 70 > candle_now['rsi']:
+                                        chasing_reason += 'R'
 
-                                        if using_usdt > 0 and price > data['entry']:
-                                            # 물타기
-                                            self.sellOrder(data, using_usdt * self.info.leverage / price, price)
+                                    if chasing_reason != '':
+                                        clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height + 0.00
+                                        if clearing_price > data['entry']:
+                                            # (평단가 * 현재 개수 + 지금 가격 * x개) * 99% = 정리 가격 * (현재 개수 + x개)
+                                            chasing_amount = (clearing_price - data['entry'] * (1 - self.chasing_target_profit)) * data['amount'] / (candle_now['close'] * (1 - self.chasing_target_profit) - clearing_price)
+                                            # print('    Chasing Entry %.4f Amount %.4f Now %.4f Clear %.4f Chasing amount %.4f' % (data['entry'], data['amount'], candle_now['close'], clearing_price, chasing_amount))
+                                            if chasing_amount * candle_now['close'] > self.balance['total'] * self.chasing_maximum_total_per * self.info.leverage:
+                                                chasing_amount = self.balance['total'] * self.chasing_maximum_total_per / candle_now['close']
+                                                # print('    Chasing amount modified %.4f' % chasing_amount)
+                                                data['chasing_amount'] = chasing_amount if chasing_amount > 0 else 0
+                                                data['chasing_remain'] = 3 if chasing_amount > 0 else 0
 
-                                        # 손절각일 경우 손절
-                                        if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per:
-                                            using_usdt = data['amount'] * price * self.stop_loss_amount_per / self.info.leverage
-                                            pnl = self.buyOrder(data, data['amount'] * self.stop_loss_amount_per, price)
+                                    # 손절각일 경우 손절
+                                    if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per:
+                                        using_usdt = data['amount'] * price * self.stop_loss_amount_per / self.info.leverage
+                                        pnl = self.buyOrder(data, data['amount'] * self.stop_loss_amount_per, price)
 
                             # 진입 체크
                             if data['position'] is None:
                                 using_usdt = self.balance['total'] * self.entry_amount_per
 
                                 if candle_sl['low'] >= candle_sl['bb_l'] and candle_now['close'] < candle_now['bb_l']:
-                                    price = candle_now['close'] + data['quote']
-                                    self.buyOrder(data, using_usdt * self.info.leverage / price, price)
+                                    price = candle_now['close'] + data['amount_min']
+                                    amount = using_usdt * self.info.leverage / price
+                                    self.buyOrder(data, amount, price)
 
                                 elif candle_sl['high'] <= candle_sl['bb_h'] and candle_now['close'] > candle_now['bb_h']:
-                                    price = candle_now['close'] - data['quote']
-                                    self.sellOrder(data, using_usdt * self.info.leverage / price, price)
+                                    price = candle_now['close'] - data['amount_min']
+                                    amount = using_usdt * self.info.leverage / price
+                                    self.sellOrder(data, amount, price)
 
-                            # 오더 오픈
-                            if data['position'] == 'Long':
-                                self.makeSellOrder(data, data['amount'], candle_now['bb_h'], candle_now, candle_prev)
-                            elif data['position'] == 'Short':
-                                self.makeBuyOrder(data, data['amount'], candle_now['bb_l'], candle_now, candle_prev)
+                            self.runChasing(data, data['chasing_amount'] / 3, candle_now['close'], candle_now['date'])
 
                             candle_count += 1
 
@@ -286,7 +405,7 @@ class TickerUpdator(metaclass=ABCMeta):
                         })
 
             except Exception as e:
-                # traceback.print_exc()
+                traceback.print_exc()
                 data['interval'] = '30m'
                 data['sl_interval'] = '1d'
                 data['best_pnl'] = 0
@@ -373,5 +492,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-TickerUpdator(config_file_name).start(48 * 15)
+TickerUpdator(config_file_name).start(48 * 30)
 

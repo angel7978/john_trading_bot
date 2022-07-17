@@ -58,11 +58,22 @@ class OrderBook:
         return ret
 
     def fetch_tickers(self):
-        print(self.exchange.fetch_tickers())
+        # print(self.exchange.fetch_tickers())
         ret = list(map(lambda ticker: ticker.replace('/', ''), filter(lambda ticker: 'USDT' in ticker, self.exchange.fetch_tickers().keys())))
         return ret
 
-    def generate_chart_data(self, symbol, timeframe='30m', limit=100):
+    def get_last_price(self, symbol, timeframe='30m'):
+        btc = self.exchange.fetch_ohlcv(
+            symbol=symbol,
+            timeframe=timeframe,
+            since=None,
+            limit=1
+        )
+
+        df = pd.DataFrame(data=btc, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
+        return df.iloc[-1]['close']
+
+    def generate_chart_data(self, symbol, timeframe='30m', limit=110):
         df = pd.DataFrame(data=None, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
 
         since = int(time.time() * 1000)
