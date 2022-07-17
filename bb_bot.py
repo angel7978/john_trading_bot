@@ -26,23 +26,19 @@ class Bot(metaclass=ABCMeta):
             "symbol": "BTCUSDT",
             "amount_min": 0.1,
             "sl_interval": "8h",
-            "interval": "30m",
-            "closing_rate": [{'length': 4, 'value': 44, 'rate': 0.08270676691729323, 'ac_rate': 0.08270676691729323}, {'length': 8, 'value': 62, 'rate': 0.11654135338345864, 'ac_rate': 0.19924812030075187}, {'length': 12, 'value': 72, 'rate': 0.13533834586466165, 'ac_rate': 0.33458646616541354}, {'length': 16, 'value': 57, 'rate': 0.10714285714285714, 'ac_rate': 0.4417293233082707}, {'length': 20, 'value': 77, 'rate': 0.14473684210526316, 'ac_rate': 0.5864661654135339}, {'length': 24, 'value': 47, 'rate': 0.08834586466165413, 'ac_rate': 0.6748120300751881}, {'length': 28, 'value': 42, 'rate': 0.07894736842105263, 'ac_rate': 0.7537593984962407}, {'length': 32, 'value': 38, 'rate': 0.07142857142857142, 'ac_rate': 0.8251879699248121}, {'length': 36, 'value': 25, 'rate': 0.046992481203007516, 'ac_rate': 0.8721804511278196}, {'length': 40, 'value': 19, 'rate': 0.03571428571428571, 'ac_rate': 0.9078947368421053}, {'length': 44, 'value': 17, 'rate': 0.03195488721804511, 'ac_rate': 0.9398496240601504}, {'length': 48, 'value': 11, 'rate': 0.020676691729323307, 'ac_rate': 0.9605263157894737}, {'length': 52, 'value': 6, 'rate': 0.011278195488721804, 'ac_rate': 0.9718045112781954}, {'length': 56, 'value': 4, 'rate': 0.007518796992481203, 'ac_rate': 0.9793233082706767}, {'length': 60, 'value': 2, 'rate': 0.0037593984962406013, 'ac_rate': 0.9830827067669173}, {'length': 64, 'value': 4, 'rate': 0.007518796992481203, 'ac_rate': 0.9906015037593985}, {'length': 68, 'value': 1, 'rate': 0.0018796992481203006, 'ac_rate': 0.9924812030075187}, {'length': 72, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9924812030075187}, {'length': 76, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9924812030075187}, {'length': 80, 'value': 1, 'rate': 0.0018796992481203006, 'ac_rate': 0.994360902255639}, {'length': 84, 'value': 2, 'rate': 0.0037593984962406013, 'ac_rate': 0.9981203007518796}, {'length': 88, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9981203007518796}, {'length': 92, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9981203007518796}, {'length': 96, 'value': 1, 'rate': 0.0018796992481203006, 'ac_rate': 0.9999999999999999}]
-
+            "interval": "30m"
         },
         {
             "symbol": "ETHUSDT",
             "amount_min": 0.01,
             "sl_interval": "6h",
-            "interval": "30m",
-            "closing_rate": [{'length': 4, 'value': 27, 'rate': 0.04981549815498155, 'ac_rate': 0.04981549815498155}, {'length': 8, 'value': 74, 'rate': 0.13653136531365315, 'ac_rate': 0.1863468634686347}, {'length': 12, 'value': 80, 'rate': 0.14760147601476015, 'ac_rate': 0.33394833948339486}, {'length': 16, 'value': 72, 'rate': 0.13284132841328414, 'ac_rate': 0.466789667896679}, {'length': 20, 'value': 74, 'rate': 0.13653136531365315, 'ac_rate': 0.6033210332103321}, {'length': 24, 'value': 49, 'rate': 0.09040590405904059, 'ac_rate': 0.6937269372693727}, {'length': 28, 'value': 40, 'rate': 0.07380073800738007, 'ac_rate': 0.7675276752767528}, {'length': 32, 'value': 37, 'rate': 0.06826568265682657, 'ac_rate': 0.8357933579335793}, {'length': 36, 'value': 25, 'rate': 0.046125461254612546, 'ac_rate': 0.8819188191881919}, {'length': 40, 'value': 20, 'rate': 0.03690036900369004, 'ac_rate': 0.9188191881918819}, {'length': 44, 'value': 14, 'rate': 0.025830258302583026, 'ac_rate': 0.9446494464944649}, {'length': 48, 'value': 9, 'rate': 0.016605166051660517, 'ac_rate': 0.9612546125461254}, {'length': 52, 'value': 6, 'rate': 0.01107011070110701, 'ac_rate': 0.9723247232472324}, {'length': 56, 'value': 4, 'rate': 0.007380073800738007, 'ac_rate': 0.9797047970479704}, {'length': 60, 'value': 3, 'rate': 0.005535055350553505, 'ac_rate': 0.985239852398524}, {'length': 64, 'value': 1, 'rate': 0.0018450184501845018, 'ac_rate': 0.9870848708487084}, {'length': 68, 'value': 4, 'rate': 0.007380073800738007, 'ac_rate': 0.9944649446494465}, {'length': 72, 'value': 1, 'rate': 0.0018450184501845018, 'ac_rate': 0.9963099630996309}, {'length': 76, 'value': 1, 'rate': 0.0018450184501845018, 'ac_rate': 0.9981549815498154}, {'length': 80, 'value': 1, 'rate': 0.0018450184501845018, 'ac_rate': 0.9999999999999999}, {'length': 84, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9999999999999999}, {'length': 88, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9999999999999999}, {'length': 92, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9999999999999999}, {'length': 96, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9999999999999999}]
+            "interval": "30m"
         },
         {
             "symbol": "BCHUSDT",
             "amount_min": 0.01,
             "sl_interval": "8h",
-            "interval": "30m",
-            "closing_rate": [{'length': 4, 'value': 27, 'rate': 0.0533596837944664, 'ac_rate': 0.0533596837944664}, {'length': 8, 'value': 58, 'rate': 0.11462450592885376, 'ac_rate': 0.16798418972332016}, {'length': 12, 'value': 72, 'rate': 0.1422924901185771, 'ac_rate': 0.3102766798418972}, {'length': 16, 'value': 70, 'rate': 0.1383399209486166, 'ac_rate': 0.4486166007905138}, {'length': 20, 'value': 79, 'rate': 0.15612648221343872, 'ac_rate': 0.6047430830039525}, {'length': 24, 'value': 54, 'rate': 0.1067193675889328, 'ac_rate': 0.7114624505928853}, {'length': 28, 'value': 50, 'rate': 0.09881422924901186, 'ac_rate': 0.8102766798418971}, {'length': 32, 'value': 15, 'rate': 0.029644268774703556, 'ac_rate': 0.8399209486166007}, {'length': 36, 'value': 24, 'rate': 0.04743083003952569, 'ac_rate': 0.8873517786561264}, {'length': 40, 'value': 17, 'rate': 0.03359683794466403, 'ac_rate': 0.9209486166007904}, {'length': 44, 'value': 9, 'rate': 0.017786561264822136, 'ac_rate': 0.9387351778656126}, {'length': 48, 'value': 8, 'rate': 0.015810276679841896, 'ac_rate': 0.9545454545454545}, {'length': 52, 'value': 6, 'rate': 0.011857707509881422, 'ac_rate': 0.9664031620553359}, {'length': 56, 'value': 6, 'rate': 0.011857707509881422, 'ac_rate': 0.9782608695652174}, {'length': 60, 'value': 1, 'rate': 0.001976284584980237, 'ac_rate': 0.9802371541501976}, {'length': 64, 'value': 3, 'rate': 0.005928853754940711, 'ac_rate': 0.9861660079051383}, {'length': 68, 'value': 5, 'rate': 0.009881422924901186, 'ac_rate': 0.9960474308300395}, {'length': 72, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9960474308300395}, {'length': 76, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9960474308300395}, {'length': 80, 'value': 1, 'rate': 0.001976284584980237, 'ac_rate': 0.9980237154150198}, {'length': 84, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9980237154150198}, {'length': 88, 'value': 0, 'rate': 0.0, 'ac_rate': 0.9980237154150198}, {'length': 92, 'value': 1, 'rate': 0.001976284584980237, 'ac_rate': 1.0}, {'length': 96, 'value': 0, 'rate': 0.0, 'ac_rate': 1.0}]
+            "interval": "30m"
         }
     ]
     simulate_const = {
@@ -405,6 +401,10 @@ class Bot(metaclass=ABCMeta):
 
     @staticmethod
     def getExpectedPnL(data, price, amount, close_price, close_price_inc, is_long=True):
+        if 'closing_rate' not in data:
+            print('There is no closing_rate in data')
+            return 0
+
         expected_pnl_list = []
         for item in data['closing_rate']:
             expected_pnl_list.append({

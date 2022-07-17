@@ -28,6 +28,7 @@ config 파일 내 telegram_id 부분에 텔레그램 id 넣기 <br />
 <ul>
 <li>볼린저밴드 Length 20, Mult 2</li>
 <li>RSI Length 14</li>
+<li>Volume 볼린저밴드 Length 100, Mult 1 (이하 VBB)</li>
 </ul>
 <li>진입 조건</li>
 <ul>
@@ -38,8 +39,11 @@ config 파일 내 telegram_id 부분에 텔레그램 id 넣기 <br />
 </ul>
 <li>if 수익</li>
 <ul>
-<li>close 값이 볼린저밴드 상단의 4/5 이상일 시 전수 시장가 매도</li>
-<li>볼린저 상단 가격에 매도 주문을 넣어놓아 볼린저밴드 상단을 뚫는 꼬리 발생시에도 매도가 될 수 있도록 함</li>
+<li>close 값이 볼린저밴드 상단의 4/5 이상일 시</li>
+<ul>
+<li>(기본) close 값이 볼린저밴드 상단의 4/5 이상일 시 전수 시장가 매도</li>
+<li>(VBB가 상단 돌파할 경우) 볼린저밴드 상단의 4/5 지점에 Take Profit Market을 걸어 놓고 대기</li>
+</ul>
 </ul>
 <li>if 손실</li>
 <ul>
