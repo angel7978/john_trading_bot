@@ -514,8 +514,8 @@ class Bot(metaclass=ABCMeta):
                     candle_now = self.createCandle(df_interval.iloc[-1])
                     candle_sl = self.createCandle(df_sl.iloc[-1])
 
-                    print("- Candle data [%s]" % data['symbol'])
-                    print(candle_now)
+                    print("- Log [%s]" % data['symbol'])
+                    print('    candle %s' % candle_now)
 
                 if self.is_simulate:
                     if data['position'] == 'Long' and data['tp_price'] != 0 and candle_now['low'] <= data['tp_price']:
@@ -704,6 +704,9 @@ class Bot(metaclass=ABCMeta):
                         self.makeTPBuyOrder(data)
 
                 self.runChasing(data, data['chasing_amount'] / 3, candle_now['close'], candle_now['date'])
+
+                if not self.is_simulate:
+                    print('    data %s' % data)
 
             candle_count += 1
 
