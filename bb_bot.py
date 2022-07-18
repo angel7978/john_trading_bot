@@ -547,19 +547,22 @@ class Bot(metaclass=ABCMeta):
                         low_bb = candle_sl['low'] < candle_sl['bb_l']
                         forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
                         if forced_close_by_bb or now_clearing_price < candle_now['close'] or low_bb or data['tp_price'] != 0:
-                            pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
-                            if pending_by_volume:
-                                data['tp_price'] = now_clearing_price
-                                data['tp_price_best'] = candle_now['close']
-                                print('%s [%s] Long Close Pending - TP (%.4f USDT), TPB (%.4f USDT), Volume (%.4f), VolumeH (%.4f), VolumeM (%.4f)' % (candle_now['date'], data['symbol'], data['tp_price'], data['tp_price_best'], candle_now['volume'], candle_now['bb_vh'], candle_now['bb_vm']))
-                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 종료 지연', '볼륨이 (%.4f) 이하로 떨어질 때 까지' % candle_now['bb_vm'], 'T/P 추가, Limit (%.4f)' % data['tp_price'])
+                            if forced_close_by_bb or low_bb:
+                                data['tp_price'] = data['tp_price_best'] = 0
+                            else:
+                                pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
+                                if pending_by_volume:
+                                    data['tp_price'] = now_clearing_price
+                                    data['tp_price_best'] = candle_now['close']
+                                    print('%s [%s] Long Close Pending - TP (%.4f USDT), TPB (%.4f USDT), Volume (%.4f), VolumeH (%.4f), VolumeM (%.4f)' % (candle_now['date'], data['symbol'], data['tp_price'], data['tp_price_best'], candle_now['volume'], candle_now['bb_vh'], candle_now['bb_vm']))
+                                    self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 종료 지연', '볼륨이 (%.4f) 이하로 떨어질 때 까지' % candle_now['bb_vm'], 'T/P 추가, Limit (%.4f)' % data['tp_price'])
 
-                            update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] < candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
-                            if update_tp_price:
-                                data['tp_price'] = data['tp_price_best']
-                                data['tp_price_best'] = candle_now['close']
-                                print('%s [%s] Long TP Update - TP (%.4f USDT), TPB (%.4f USDT), Volume (%.4f), VolumeH (%.4f), VolumeM (%.4f)' % (candle_now['date'], data['symbol'], data['tp_price'], data['tp_price_best'], candle_now['volume'], candle_now['bb_vh'], candle_now['bb_vm']))
-                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 종료 지연', '볼륨이 (%.4f) 이하로 떨어질 때 까지' % candle_now['bb_vm'], 'T/P 업데이트, Limit (%.4f)' % data['tp_price'])
+                                update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] < candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
+                                if update_tp_price:
+                                    data['tp_price'] = data['tp_price_best']
+                                    data['tp_price_best'] = candle_now['close']
+                                    print('%s [%s] Long TP Update - TP (%.4f USDT), TPB (%.4f USDT), Volume (%.4f), VolumeH (%.4f), VolumeM (%.4f)' % (candle_now['date'], data['symbol'], data['tp_price'], data['tp_price_best'], candle_now['volume'], candle_now['bb_vh'], candle_now['bb_vm']))
+                                    self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 종료 지연', '볼륨이 (%.4f) 이하로 떨어질 때 까지' % candle_now['bb_vm'], 'T/P 업데이트, Limit (%.4f)' % data['tp_price'])
 
                             close_by_volume = data['tp_price'] != 0 and candle_now['volume'] <= candle_now['bb_vm']
 
@@ -619,19 +622,22 @@ class Bot(metaclass=ABCMeta):
                         high_bb = candle_sl['high'] > candle_sl['bb_h']
                         forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
                         if forced_close_by_bb or now_clearing_price > candle_now['close'] or high_bb or data['tp_price'] != 0:
-                            pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
-                            if pending_by_volume:
-                                data['tp_price'] = now_clearing_price
-                                data['tp_price_best'] = candle_now['close']
-                                print('%s [%s] Short Close Pending - TP (%.4f USDT), TPB (%.4f USDT), Volume (%.4f), VolumeH (%.4f), VolumeM (%.4f)' % (candle_now['date'], data['symbol'], data['tp_price'], data['tp_price_best'], candle_now['volume'], candle_now['bb_vh'], candle_now['bb_vm']))
-                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 종료 지연', '볼륨이 (%.4f) 이하로 떨어질 때 까지' % candle_now['bb_vm'], 'T/P 추가, Limit (%.4f)' % data['tp_price'])
+                            if forced_close_by_bb or high_bb:
+                                data['tp_price'] = data['tp_price_best'] = 0
+                            else:
+                                pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
+                                if pending_by_volume:
+                                    data['tp_price'] = now_clearing_price
+                                    data['tp_price_best'] = candle_now['close']
+                                    print('%s [%s] Short Close Pending - TP (%.4f USDT), TPB (%.4f USDT), Volume (%.4f), VolumeH (%.4f), VolumeM (%.4f)' % (candle_now['date'], data['symbol'], data['tp_price'], data['tp_price_best'], candle_now['volume'], candle_now['bb_vh'], candle_now['bb_vm']))
+                                    self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 종료 지연', '볼륨이 (%.4f) 이하로 떨어질 때 까지' % candle_now['bb_vm'], 'T/P 추가, Limit (%.4f)' % data['tp_price'])
 
-                            update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] > candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
-                            if update_tp_price:
-                                data['tp_price'] = data['tp_price_best']
-                                data['tp_price_best'] = candle_now['close']
-                                print('%s [%s] Short TP Update - TP (%.4f USDT), TPB (%.4f USDT), Volume (%.4f), VolumeH (%.4f), VolumeM (%.4f)' % (candle_now['date'], data['symbol'], data['tp_price'], data['tp_price_best'], candle_now['volume'], candle_now['bb_vh'], candle_now['bb_vm']))
-                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 종료 지연', '볼륨이 (%.4f) 이하로 떨어질 때 까지' % candle_now['bb_vm'], 'T/P 업데이트, Limit (%.4f)' % data['tp_price'])
+                                update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] > candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
+                                if update_tp_price:
+                                    data['tp_price'] = data['tp_price_best']
+                                    data['tp_price_best'] = candle_now['close']
+                                    print('%s [%s] Short TP Update - TP (%.4f USDT), TPB (%.4f USDT), Volume (%.4f), VolumeH (%.4f), VolumeM (%.4f)' % (candle_now['date'], data['symbol'], data['tp_price'], data['tp_price_best'], candle_now['volume'], candle_now['bb_vh'], candle_now['bb_vm']))
+                                    self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 종료 지연', '볼륨이 (%.4f) 이하로 떨어질 때 까지' % candle_now['bb_vm'], 'T/P 업데이트, Limit (%.4f)' % data['tp_price'])
 
                             close_by_volume = data['tp_price'] != 0 and candle_now['volume'] <= candle_now['bb_vm']
 
@@ -774,5 +780,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(96*365)
 
