@@ -39,7 +39,19 @@ class Bot(metaclass=ABCMeta):
             "amount_min": 0.01,
             "sl_interval": "8h",
             "interval": "30m"
-        }
+        },
+        {
+            "symbol": "ETCUSDT",
+            "amount_min": 0.001,
+            "sl_interval": "2h",
+            "interval": "30m"
+        },
+        {
+            "symbol": "LTCUSDT",
+            "amount_min": 0.01,
+            "sl_interval": "4h",
+            "interval": "30m"
+        },
     ]
     simulate_const = {
         '15m': {
@@ -99,11 +111,10 @@ class Bot(metaclass=ABCMeta):
         if data_length == 0:
             self.sendTelegramPush(self.title, '체인이 선택되지 않았습니다!! config 파일을 확인 해 주세요. [%s]' % self.info.using_symbol)
 
-        self.taker_commission = 0.0004
-        self.entry_amount_per = 0.1
-        self.added_amount_per = 0.025
-        self.stop_loss_threshold_total_per = 0.25
-        self.stop_loss_amount_per = 0.5
+        self.taker_commission = 0.0004  # taker 수수료
+        self.entry_amount_per = 0.1  # 진입시 사용되는 USDT
+        self.stop_loss_threshold_total_per = 0.2  # 손절 상한
+        self.stop_loss_amount_per = 0.5  # 손절 시 털어낼 비율
         self.close_position_threshold_bb_height = 0.80
         self.chasing_target_profit = 0.01
         self.chasing_maximum_total_per = 0.1
@@ -558,6 +569,9 @@ class Bot(metaclass=ABCMeta):
                                     reason = '(BB 폭이 좁아져 강제 종료)'
                                 elif low_bb:
                                     reason = '(이전 %s 캔들이 BB 하단 돌파)' % data['sl_interval']
+                                elif close_by_volume:
+                                    reason = '(볼륨 하락으로 인해 종료)'
+
                                 used_usdt = data['amount'] * data['entry'] / self.info.leverage
                                 gain_usdt = data['amount'] * price / self.info.leverage
                                 pnl = self.sellOrder(data, data['amount'], price)
@@ -627,6 +641,8 @@ class Bot(metaclass=ABCMeta):
                                     reason = '(BB 폭이 좁아져 강제 종료)'
                                 elif high_bb:
                                     reason = '(이전 %s 캔들이 BB 상단 돌파)' % data['sl_interval']
+                                elif close_by_volume:
+                                    reason = '(볼륨 하락으로 인해 종료)'
 
                                 gained_usdt = data['amount'] * data['entry'] / self.info.leverage
                                 using_usdt = data['amount'] * price / self.info.leverage
