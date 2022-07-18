@@ -23,7 +23,6 @@ config 파일 내 telegram_id 부분에 텔레그램 id 넣기 <br />
 
 <h2>기본 로직 (Long)</h2>
 <ul>
-<li>시장가 매수, 매도로 거래</li>
 <li>지표</li>
 <ul>
 <li>볼린저밴드 Length 20, Mult 2</li>
@@ -39,10 +38,12 @@ config 파일 내 telegram_id 부분에 텔레그램 id 넣기 <br />
 </ul>
 <li>if 수익</li>
 <ul>
-<li>close 값이 볼린저밴드 상단의 4/5 이상일 시</li>
+<li>close 값이 볼린저밴드 상단의 4/5 이상일 시 전부 시장가 매도</li>
+<li>만약 위 조건에서 VBB가 상단을 돌파 한 경우 매도를 보류하고 Take profit market을 볼린저밴드 상단의 4/5 지점에 설정후 대기, 이후 아래 케이스에 맞게 동작</li>
 <ul>
-<li>(기본) close 값이 볼린저밴드 상단의 4/5 이상일 시 전수 시장가 매도</li>
-<li>(VBB가 상단 돌파할 경우) 볼린저밴드 상단의 4/5 지점에 Take Profit Market을 걸어 놓고 대기</li>
+<li>다음 봉에 VBB가 상단을 돌파하고 양봉일 경우, 이전 캔들 중 가장 높은 close 가격에 Take profit market을 설정후 계속 대기</li>
+<li>다음 봉에 VBB가 미들 아래로 떨어진 경우 전액 시장가 매도</li>
+<li>이 외에 케이스에는 계속 대기</li>
 </ul>
 </ul>
 <li>if 손실</li>

@@ -1,1253 +1,1253 @@
 [
     {
-        "symbol": "OPUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 2049.2403456445245,
-        "average_pnl": 1413.2128970893525,
-        "worst_pnl": 1092.168916017465,
-        "interval": "1h"
-    },
-    {
-        "symbol": "C98USDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 2014.6157013085713,
-        "average_pnl": 1418.9386866943773,
-        "worst_pnl": 1075.4157855221927,
-        "interval": "15m"
-    },
-    {
-        "symbol": "RSRUSDT",
-        "amount_min": 1e-06,
-        "sl_interval": "1d",
-        "best_pnl": 1960.5897502847452,
-        "average_pnl": 1119.4733985437704,
-        "worst_pnl": 488.04936389741215,
-        "interval": "15m"
-    },
-    {
-        "symbol": "SUSHIUSDT",
+        "symbol": "SNXUSDT",
         "amount_min": 0.001,
-        "sl_interval": "12h",
-        "best_pnl": 1884.4949516636018,
-        "average_pnl": 1394.5326362894548,
-        "worst_pnl": 1120.8661854752895,
-        "interval": "15m"
-    },
-    {
-        "symbol": "GALUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1869.2740931481865,
-        "average_pnl": 1307.5245804082722,
-        "worst_pnl": 934.666733656428,
-        "interval": "15m"
-    },
-    {
-        "symbol": "ROSEUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1853.7852865187351,
-        "average_pnl": 1294.141573452727,
-        "worst_pnl": 920.0042124787061,
-        "interval": "15m"
-    },
-    {
-        "symbol": "SFPUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1827.4153244816378,
-        "average_pnl": 1260.671179451142,
-        "worst_pnl": 843.7999375527072,
-        "interval": "15m"
-    },
-    {
-        "symbol": "1000XECUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1820.7423819940034,
-        "average_pnl": 1306.2893032148138,
-        "worst_pnl": 812.6125523269473,
+        "sl_interval": "2h",
+        "best_pnl": 3073.212277273876,
+        "average_pnl": 1340.5797177825168,
+        "worst_pnl": 371.4168036622494,
         "interval": "30m"
     },
     {
-        "symbol": "GTCUSDT",
+        "symbol": "LITUSDT",
         "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1820.4388212072513,
-        "average_pnl": 1285.5764059027363,
-        "worst_pnl": 827.7127990868651,
-        "interval": "15m"
+        "sl_interval": "2h",
+        "best_pnl": 2474.5986462359556,
+        "average_pnl": 1359.675563071902,
+        "worst_pnl": 877.5445106244464,
+        "interval": "30m"
     },
     {
-        "symbol": "AUDIOUSDT",
+        "symbol": "BTSUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 2398.266777776798,
+        "average_pnl": 1539.7339973597984,
+        "worst_pnl": 1213.0169618371956,
+        "interval": "30m"
+    },
+    {
+        "symbol": "SOLUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "2h",
+        "best_pnl": 2368.8920649564516,
+        "average_pnl": 1487.650177103137,
+        "worst_pnl": 1205.7272582509213,
+        "interval": "30m"
+    },
+    {
+        "symbol": "MATICUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1811.451311500373,
-        "average_pnl": 1275.9070062378532,
-        "worst_pnl": 900.2884041229662,
-        "interval": "1h"
+        "sl_interval": "2h",
+        "best_pnl": 2321.6186318311784,
+        "average_pnl": 1553.9482753000746,
+        "worst_pnl": 1002.5189675266384,
+        "interval": "30m"
+    },
+    {
+        "symbol": "RENUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 2317.5241300690923,
+        "average_pnl": 1304.4997983108071,
+        "worst_pnl": 919.8397124932608,
+        "interval": "30m"
+    },
+    {
+        "symbol": "NKNUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 2299.1819204354742,
+        "average_pnl": 1519.723767876485,
+        "worst_pnl": 721.0700953399376,
+        "interval": "30m"
+    },
+    {
+        "symbol": "DYDXUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 2113.078482477867,
+        "average_pnl": 1230.1042584304587,
+        "worst_pnl": 904.5081707780789,
+        "interval": "30m"
+    },
+    {
+        "symbol": "OGNUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 2111.5464650392933,
+        "average_pnl": 1488.0962649272067,
+        "worst_pnl": 1151.4520835689812,
+        "interval": "30m"
+    },
+    {
+        "symbol": "WOOUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 2103.4648090819724,
+        "average_pnl": 1113.5626954337984,
+        "worst_pnl": 790.2010293723805,
+        "interval": "30m"
+    },
+    {
+        "symbol": "BALUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 2096.0003203515203,
+        "average_pnl": 1502.7516380680438,
+        "worst_pnl": 1154.924535818425,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ENSUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "6h",
+        "best_pnl": 2056.470937719284,
+        "average_pnl": 1537.9913077010115,
+        "worst_pnl": 1075.7052381017895,
+        "interval": "30m"
+    },
+    {
+        "symbol": "COMPUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "2h",
+        "best_pnl": 2053.2718370389,
+        "average_pnl": 1297.3185550810476,
+        "worst_pnl": 931.6897618173,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ATAUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 2044.8096319093297,
+        "average_pnl": 1518.4514937841188,
+        "worst_pnl": 1093.1954192918306,
+        "interval": "30m"
+    },
+    {
+        "symbol": "OPUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "6h",
+        "best_pnl": 2026.1222061128815,
+        "average_pnl": 1782.9494761715498,
+        "worst_pnl": 1417.4980379899384,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ARUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1993.5549715001357,
+        "average_pnl": 1331.235973195737,
+        "worst_pnl": 1101.9541701743647,
+        "interval": "30m"
+    },
+    {
+        "symbol": "BAKEUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1989.651498762258,
+        "average_pnl": 1617.0030954824772,
+        "worst_pnl": 1390.867434607666,
+        "interval": "30m"
     },
     {
         "symbol": "MTLUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1801.5212385273915,
-        "average_pnl": 1319.1968629819164,
-        "worst_pnl": 931.3559539671376,
+        "sl_interval": "4h",
+        "best_pnl": 1981.536330406502,
+        "average_pnl": 1697.781907561498,
+        "worst_pnl": 1393.9805068644303,
+        "interval": "30m"
+    },
+    {
+        "symbol": "UNFIUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1969.5991448282243,
+        "average_pnl": 1406.6074224568802,
+        "worst_pnl": 976.3223175478676,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ONEUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1962.2351717453175,
+        "average_pnl": 1503.7922384780734,
+        "worst_pnl": 1160.6252757823029,
+        "interval": "30m"
+    },
+    {
+        "symbol": "DGBUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "4h",
+        "best_pnl": 1954.726719574854,
+        "average_pnl": 1505.5486279858485,
+        "worst_pnl": 1247.0128577536875,
+        "interval": "30m"
+    },
+    {
+        "symbol": "BELUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1949.1073534911297,
+        "average_pnl": 1645.3996888957445,
+        "worst_pnl": 1382.819960033302,
+        "interval": "30m"
+    },
+    {
+        "symbol": "COTIUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1942.2289396465178,
+        "average_pnl": 1424.955175814158,
+        "worst_pnl": 1104.8507676051927,
+        "interval": "30m"
+    },
+    {
+        "symbol": "APEUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "4h",
+        "best_pnl": 1931.645433013383,
+        "average_pnl": 1503.5110604066774,
+        "worst_pnl": 1304.5704805229427,
+        "interval": "30m"
+    },
+    {
+        "symbol": "SRMUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "4h",
+        "best_pnl": 1919.0640751567723,
+        "average_pnl": 1505.296956641967,
+        "worst_pnl": 938.3603846790106,
+        "interval": "30m"
+    },
+    {
+        "symbol": "LPTUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1916.5218419381254,
+        "average_pnl": 1643.1983524064515,
+        "worst_pnl": 1351.4378809751033,
+        "interval": "30m"
+    },
+    {
+        "symbol": "1000XECUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "4h",
+        "best_pnl": 1891.6516167887362,
+        "average_pnl": 1599.23014623817,
+        "worst_pnl": 1401.0960828540724,
+        "interval": "30m"
+    },
+    {
+        "symbol": "SUSHIUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "4h",
+        "best_pnl": 1884.3073199603557,
+        "average_pnl": 1485.487087459526,
+        "worst_pnl": 1117.8913982592721,
+        "interval": "30m"
+    },
+    {
+        "symbol": "BLZUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1868.5264295784018,
+        "average_pnl": 1599.1382663536117,
+        "worst_pnl": 1454.8816559461093,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ETCUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1864.391942041797,
+        "average_pnl": 1263.489790128832,
+        "worst_pnl": 1089.4152284240433,
+        "interval": "30m"
+    },
+    {
+        "symbol": "STORJUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "6h",
+        "best_pnl": 1837.635804353361,
+        "average_pnl": 1453.9944795997378,
+        "worst_pnl": 867.8646163249763,
+        "interval": "30m"
+    },
+    {
+        "symbol": "GALUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1836.505335048696,
+        "average_pnl": 1507.1624824483406,
+        "worst_pnl": 1256.6184820493609,
+        "interval": "30m"
+    },
+    {
+        "symbol": "UNIUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1826.9828152216685,
+        "average_pnl": 1432.5068277824005,
+        "worst_pnl": 1215.1299865552307,
+        "interval": "30m"
+    },
+    {
+        "symbol": "LTCUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "2h",
+        "best_pnl": 1792.1746474053011,
+        "average_pnl": 1598.6209051613412,
+        "worst_pnl": 1400.505726681195,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ALPHAUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1782.972805051657,
+        "average_pnl": 1416.183278093008,
+        "worst_pnl": 1219.5237793906333,
+        "interval": "30m"
+    },
+    {
+        "symbol": "CRVUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1776.5533721372879,
+        "average_pnl": 1315.0428500847077,
+        "worst_pnl": 944.8449049643668,
+        "interval": "30m"
+    },
+    {
+        "symbol": "JASMYUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1770.7104201520053,
+        "average_pnl": 1611.0173191893552,
+        "worst_pnl": 1410.2489735992274,
+        "interval": "30m"
+    },
+    {
+        "symbol": "AUDIOUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "6h",
+        "best_pnl": 1764.5094868455903,
+        "average_pnl": 1587.4654978996934,
+        "worst_pnl": 1244.4856737130408,
+        "interval": "30m"
+    },
+    {
+        "symbol": "LINKUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "4h",
+        "best_pnl": 1757.701896511452,
+        "average_pnl": 1552.0423533044032,
+        "worst_pnl": 1210.4763565054157,
+        "interval": "30m"
+    },
+    {
+        "symbol": "GALAUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "4h",
+        "best_pnl": 1755.6845950715158,
+        "average_pnl": 1603.3914278514505,
+        "worst_pnl": 1418.0418523132712,
         "interval": "30m"
     },
     {
         "symbol": "GRTUSDT",
         "amount_min": 1e-05,
         "sl_interval": "1d",
-        "best_pnl": 1792.9078442703028,
-        "average_pnl": 1257.1347042002758,
-        "worst_pnl": 839.1106448715541,
+        "best_pnl": 1744.788431103661,
+        "average_pnl": 1598.2609074649752,
+        "worst_pnl": 1475.6231390597602,
         "interval": "30m"
     },
     {
-        "symbol": "AAVEUSDT",
-        "amount_min": 0.01,
-        "sl_interval": "1d",
-        "best_pnl": 1787.2640327206366,
-        "average_pnl": 1064.0917121942282,
-        "worst_pnl": 747.9822426373838,
-        "interval": "30m"
-    },
-    {
-        "symbol": "IMXUSDT",
+        "symbol": "1INCHUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "8h",
-        "best_pnl": 1779.7551272793432,
-        "average_pnl": 1421.740816773384,
-        "worst_pnl": 1151.4514915924435,
-        "interval": "15m"
-    },
-    {
-        "symbol": "RENUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1770.8842475859226,
-        "average_pnl": 1359.1459309815614,
-        "worst_pnl": 1058.524475371788,
-        "interval": "15m"
-    },
-    {
-        "symbol": "OGNUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1753.6406831306372,
-        "average_pnl": 1269.7152295106973,
-        "worst_pnl": 832.4299755055144,
-        "interval": "15m"
-    },
-    {
-        "symbol": "RVNUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1736.8677434894985,
-        "average_pnl": 1178.6024972605676,
-        "worst_pnl": 861.6334497335707,
-        "interval": "15m"
-    },
-    {
-        "symbol": "MASKUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "8h",
-        "best_pnl": 1729.9867942671206,
-        "average_pnl": 1243.6660228248625,
-        "worst_pnl": 1023.6702154397411,
-        "interval": "15m"
-    },
-    {
-        "symbol": "IOTAUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1719.3073588173168,
-        "average_pnl": 1195.349611484204,
-        "worst_pnl": 881.2372195008187,
-        "interval": "15m"
-    },
-    {
-        "symbol": "ENSUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1716.8490926216207,
-        "average_pnl": 1329.9677591373106,
-        "worst_pnl": 1149.5203278342221,
-        "interval": "15m"
-    },
-    {
-        "symbol": "BANDUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1709.0546165192502,
-        "average_pnl": 1257.6523204583868,
-        "worst_pnl": 884.987555751951,
-        "interval": "15m"
-    },
-    {
-        "symbol": "QTUMUSDT",
-        "amount_min": 0.001,
         "sl_interval": "6h",
-        "best_pnl": 1691.8797287044404,
-        "average_pnl": 1406.4579607549358,
-        "worst_pnl": 1125.9837533066238,
+        "best_pnl": 1741.8424485775154,
+        "average_pnl": 1384.8985399694304,
+        "worst_pnl": 1050.5564375224108,
         "interval": "30m"
     },
     {
-        "symbol": "ALPHAUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1679.3572741225164,
-        "average_pnl": 1163.617886280914,
-        "worst_pnl": 786.1008441537418,
-        "interval": "30m"
-    },
-    {
-        "symbol": "OMGUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1676.1640324302803,
-        "average_pnl": 1368.5353194043814,
-        "worst_pnl": 1121.4853715725794,
-        "interval": "15m"
-    },
-    {
-        "symbol": "FTMUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1672.1597138069635,
-        "average_pnl": 1123.187135769563,
-        "worst_pnl": 771.8662453149107,
-        "interval": "30m"
-    },
-    {
-        "symbol": "OCEANUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1669.3374626172435,
-        "average_pnl": 1252.3039587158228,
-        "worst_pnl": 845.6587668834887,
-        "interval": "15m"
-    },
-    {
-        "symbol": "LRCUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1664.6078897721807,
-        "average_pnl": 1305.9891532984745,
-        "worst_pnl": 1054.9948312373424,
-        "interval": "15m"
-    },
-    {
-        "symbol": "LINKUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1662.689305809006,
-        "average_pnl": 1380.8668975325998,
-        "worst_pnl": 1104.8146770625585,
-        "interval": "15m"
-    },
-    {
-        "symbol": "DENTUSDT",
-        "amount_min": 1e-06,
-        "sl_interval": "8h",
-        "best_pnl": 1660.1860911628141,
-        "average_pnl": 1373.740372614328,
-        "worst_pnl": 1133.4851535354912,
-        "interval": "30m"
-    },
-    {
-        "symbol": "CHRUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1650.0951089936898,
-        "average_pnl": 1263.6281605368472,
-        "worst_pnl": 719.9678357061047,
-        "interval": "15m"
-    },
-    {
-        "symbol": "BCHUSDT",
-        "amount_min": 0.01,
-        "interval": "15m",
-        "sl_interval": "1d",
-        "best_pnl": 1644.196149596107,
-        "average_pnl": 1321.7763474995554,
-        "worst_pnl": 1050.873128199953
-    },
-    {
-        "symbol": "BTSUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1639.7008256950537,
-        "average_pnl": 1287.2785762721637,
-        "worst_pnl": 956.1419967777873,
-        "interval": "30m"
-    },
-    {
-        "symbol": "SKLUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "8h",
-        "best_pnl": 1625.3633909916748,
-        "average_pnl": 1276.4145317703192,
-        "worst_pnl": 933.9023717650466,
-        "interval": "15m"
-    },
-    {
-        "symbol": "UNIUSDT",
+        "symbol": "WAVESUSDT",
         "amount_min": 0.001,
         "sl_interval": "12h",
-        "best_pnl": 1625.223648063221,
-        "average_pnl": 1130.5875147036415,
-        "worst_pnl": 785.7766807072832,
-        "interval": "15m"
-    },
-    {
-        "symbol": "1000SHIBUSDT",
-        "amount_min": 1e-06,
-        "sl_interval": "1d",
-        "best_pnl": 1616.5951152720856,
-        "average_pnl": 1067.0714355060663,
-        "worst_pnl": 601.1192891344057,
-        "interval": "15m"
-    },
-    {
-        "symbol": "BLZUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1581.1517715273123,
-        "average_pnl": 1296.5114407864485,
-        "worst_pnl": 951.0673412400342,
+        "best_pnl": 1740.5599154459915,
+        "average_pnl": 1554.846323357805,
+        "worst_pnl": 1068.178266072454,
         "interval": "30m"
     },
     {
-        "symbol": "DEFIUSDT",
-        "amount_min": 0.1,
-        "sl_interval": "1d",
-        "best_pnl": 1572.5952283764043,
-        "average_pnl": 1194.8571430015068,
-        "worst_pnl": 805.6444852083898,
-        "interval": "30m"
-    },
-    {
-        "symbol": "DGBUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1555.9490297031848,
-        "average_pnl": 1140.9957709103228,
-        "worst_pnl": 818.500428002605,
+        "symbol": "KNCUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1731.6211865377813,
+        "average_pnl": 1460.2710673131076,
+        "worst_pnl": 1252.645525068713,
         "interval": "30m"
     },
     {
         "symbol": "ETHUSDT",
         "amount_min": 0.01,
-        "sl_interval": "6h",
-        "best_pnl": 1554.4516695328837,
-        "average_pnl": 1186.7766537772554,
-        "worst_pnl": 968.5732370300249,
+        "sl_interval": "2h",
+        "best_pnl": 1723.6734026248607,
+        "average_pnl": 1595.824214788627,
+        "worst_pnl": 1403.3335566236651,
         "interval": "30m"
     },
     {
-        "symbol": "NKNUSDT",
+        "symbol": "ARPAUSDT",
         "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1551.7182303480317,
-        "average_pnl": 1070.1501195295227,
-        "worst_pnl": 699.6132902333459,
-        "interval": "15m"
-    },
-    {
-        "symbol": "XTZUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1548.6640442221446,
-        "average_pnl": 1184.2003342855396,
-        "worst_pnl": 916.0107720007795,
-        "interval": "15m"
-    },
-    {
-        "symbol": "BALUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1546.2123252147617,
-        "average_pnl": 1152.2404760929494,
-        "worst_pnl": 747.2899166117152,
-        "interval": "30m"
-    },
-    {
-        "symbol": "NEARUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1543.337694548964,
-        "average_pnl": 1099.8089796528275,
-        "worst_pnl": 772.4850318797671,
-        "interval": "30m"
-    },
-    {
-        "symbol": "ZECUSDT",
-        "amount_min": 0.01,
         "sl_interval": "4h",
-        "best_pnl": 1540.8845679994379,
-        "average_pnl": 1238.105298442645,
-        "worst_pnl": 1045.749184855636,
-        "interval": "15m"
+        "best_pnl": 1716.2923913517202,
+        "average_pnl": 1360.5645102813457,
+        "worst_pnl": 787.9003963498735,
+        "interval": "30m"
     },
     {
-        "symbol": "TOMOUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1531.5909203394808,
-        "average_pnl": 1227.2588862221987,
-        "worst_pnl": 1045.5460738569748,
-        "interval": "15m"
-    },
-    {
-        "symbol": "BELUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1527.5634861008123,
-        "average_pnl": 1076.7218237979348,
-        "worst_pnl": 776.4657896448987,
-        "interval": "1h"
-    },
-    {
-        "symbol": "CHZUSDT",
+        "symbol": "ZILUSDT",
         "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1520.8028174305184,
-        "average_pnl": 1150.646959698729,
-        "worst_pnl": 913.1858993352898,
+        "sl_interval": "2h",
+        "best_pnl": 1708.3769846049174,
+        "average_pnl": 1387.6295665914038,
+        "worst_pnl": 1212.4000829304518,
         "interval": "30m"
     },
     {
-        "symbol": "COMPUSDT",
-        "amount_min": 0.01,
-        "sl_interval": "1d",
-        "best_pnl": 1520.589770737103,
-        "average_pnl": 1140.5591252815561,
-        "worst_pnl": 664.5474766080106,
+        "symbol": "RLCUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1700.8187241561584,
+        "average_pnl": 1397.2044768693688,
+        "worst_pnl": 1226.5817451051507,
         "interval": "30m"
     },
     {
-        "symbol": "LTCUSDT",
-        "amount_min": 0.01,
-        "sl_interval": "1d",
-        "best_pnl": 1519.38874585317,
-        "average_pnl": 1249.0447239063806,
-        "worst_pnl": 964.5062358572272,
-        "interval": "30m"
-    },
-    {
-        "symbol": "RUNEUSDT",
+        "symbol": "FLOWUSDT",
         "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1513.1687763280672,
-        "average_pnl": 1097.417789930898,
-        "worst_pnl": 783.8567701210418,
-        "interval": "15m"
+        "sl_interval": "2h",
+        "best_pnl": 1698.4682302612503,
+        "average_pnl": 1228.3231096287768,
+        "worst_pnl": 1031.3981569638229,
+        "interval": "30m"
+    },
+    {
+        "symbol": "C98USDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1692.6524753521228,
+        "average_pnl": 1467.18848672673,
+        "worst_pnl": 1297.4973643542405,
+        "interval": "30m"
     },
     {
         "symbol": "THETAUSDT",
         "amount_min": 0.001,
         "sl_interval": "4h",
-        "best_pnl": 1511.425576498424,
-        "average_pnl": 1053.7015334393743,
-        "worst_pnl": 709.9587539852918,
+        "best_pnl": 1671.0912314911577,
+        "average_pnl": 1413.906500266328,
+        "worst_pnl": 1213.3461025282882,
         "interval": "30m"
     },
     {
-        "symbol": "STMXUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1510.1837132689661,
-        "average_pnl": 1076.8637890452387,
-        "worst_pnl": 708.769707850036,
-        "interval": "1h"
+        "symbol": "ALICEUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1670.6447749291717,
+        "average_pnl": 1351.2691855167848,
+        "worst_pnl": 1101.853247251841,
+        "interval": "30m"
     },
     {
-        "symbol": "RLCUSDT",
+        "symbol": "CELRUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1661.1001887239822,
+        "average_pnl": 1255.2386085404448,
+        "worst_pnl": 893.8131157811367,
+        "interval": "30m"
+    },
+    {
+        "symbol": "SANDUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1498.8188017626005,
-        "average_pnl": 1252.6629974063446,
-        "worst_pnl": 935.1887130273622,
-        "interval": "15m"
-    },
-    {
-        "symbol": "DYDXUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "12h",
-        "best_pnl": 1495.7444902385312,
-        "average_pnl": 1183.2256174425231,
-        "worst_pnl": 817.8906651884643,
+        "sl_interval": "2h",
+        "best_pnl": 1654.0419403171657,
+        "average_pnl": 1257.105704017264,
+        "worst_pnl": 954.0845852318499,
         "interval": "30m"
     },
     {
-        "symbol": "HNTUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1486.8598278556024,
-        "average_pnl": 1250.1313528490061,
-        "worst_pnl": 1122.521734349382,
-        "interval": "15m"
-    },
-    {
-        "symbol": "ANTUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1485.1281147761683,
-        "average_pnl": 1176.4369669735481,
-        "worst_pnl": 974.0643533787152,
-        "interval": "30m"
-    },
-    {
-        "symbol": "WOOUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "12h",
-        "best_pnl": 1482.2336474822127,
-        "average_pnl": 1211.2857402993134,
-        "worst_pnl": 948.2508393226663,
-        "interval": "15m"
-    },
-    {
-        "symbol": "ARPAUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "12h",
-        "best_pnl": 1478.9637721513923,
-        "average_pnl": 1040.9717617022134,
-        "worst_pnl": 502.364938828157,
-        "interval": "15m"
-    },
-    {
-        "symbol": "KNCUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "6h",
-        "best_pnl": 1477.2185013482433,
-        "average_pnl": 1232.2450489289463,
-        "worst_pnl": 1084.4138604155426,
-        "interval": "30m"
-    },
-    {
-        "symbol": "KAVAUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1467.2293432075369,
-        "average_pnl": 1088.9660565417585,
-        "worst_pnl": 918.5299749340393,
-        "interval": "15m"
-    },
-    {
-        "symbol": "REEFUSDT",
+        "symbol": "RSRUSDT",
         "amount_min": 1e-06,
-        "sl_interval": "1d",
-        "best_pnl": 1466.0036929451455,
-        "average_pnl": 1137.7493791586628,
-        "worst_pnl": 896.7938122476879,
-        "interval": "15m"
+        "sl_interval": "2h",
+        "best_pnl": 1652.3577047520787,
+        "average_pnl": 1431.749585891547,
+        "worst_pnl": 1127.0152491858173,
+        "interval": "30m"
     },
     {
-        "symbol": "BTCUSDT",
+        "symbol": "MKRUSDT",
         "amount_min": 0.1,
-        "sl_interval": "12h",
-        "best_pnl": 1464.0289830629195,
-        "average_pnl": 1157.713330540593,
-        "worst_pnl": 816.2938505206367,
-        "interval": "30m"
-    },
-    {
-        "symbol": "VETUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "6h",
-        "best_pnl": 1459.5519117734734,
-        "average_pnl": 1205.8526588598222,
-        "worst_pnl": 1024.721879569366,
-        "interval": "30m"
-    },
-    {
-        "symbol": "BAKEUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1448.0217136505928,
-        "average_pnl": 1082.21391026015,
-        "worst_pnl": 761.7840203002935,
-        "interval": "30m"
-    },
-    {
-        "symbol": "DARUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1446.4532309354347,
-        "average_pnl": 1231.9678777805989,
-        "worst_pnl": 931.5296905111466,
-        "interval": "30m"
-    },
-    {
-        "symbol": "FILUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1433.7587083052176,
-        "average_pnl": 1222.0374641200528,
-        "worst_pnl": 963.0573216557368,
-        "interval": "30m"
-    },
-    {
-        "symbol": "LPTUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "6h",
-        "best_pnl": 1420.8409894713418,
-        "average_pnl": 1106.7609926614782,
-        "worst_pnl": 676.2139986624842,
-        "interval": "30m"
-    },
-    {
-        "symbol": "GALAUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1414.4811156663004,
-        "average_pnl": 1159.3760269557308,
-        "worst_pnl": 938.2765901912771,
-        "interval": "30m"
-    },
-    {
-        "symbol": "HOTUSDT",
-        "amount_min": 1e-06,
-        "sl_interval": "1d",
-        "best_pnl": 1412.21980332234,
-        "average_pnl": 1199.4527684154327,
-        "worst_pnl": 920.1136175632834,
-        "interval": "15m"
-    },
-    {
-        "symbol": "ATOMUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "6h",
-        "best_pnl": 1411.8985733248826,
-        "average_pnl": 1290.0493573561782,
-        "worst_pnl": 1065.647940746693,
-        "interval": "1h"
-    },
-    {
-        "symbol": "ANKRUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1404.021976692021,
-        "average_pnl": 1121.6599017975343,
-        "worst_pnl": 926.3060742067911,
-        "interval": "1h"
-    },
-    {
-        "symbol": "LINAUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1401.5631458232376,
-        "average_pnl": 1082.0151578010818,
-        "worst_pnl": 788.341354267499,
-        "interval": "15m"
-    },
-    {
-        "symbol": "APEUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1400.3096800072487,
-        "average_pnl": 1077.646550145206,
-        "worst_pnl": 864.1304196148324,
-        "interval": "1h"
-    },
-    {
-        "symbol": "JASMYUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1399.4563475756388,
-        "average_pnl": 1144.687348861186,
-        "worst_pnl": 971.6010539324693,
+        "sl_interval": "2h",
+        "best_pnl": 1651.7531754966967,
+        "average_pnl": 1237.4217211886998,
+        "worst_pnl": 890.7165672716678,
         "interval": "30m"
     },
     {
         "symbol": "CTSIUSDT",
         "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1644.9688546751156,
+        "average_pnl": 1353.8100862215435,
+        "worst_pnl": 1138.8431025823388,
+        "interval": "30m"
+    },
+    {
+        "symbol": "SKLUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1643.3989929915485,
+        "average_pnl": 1373.1133740846462,
+        "worst_pnl": 1225.053389349703,
+        "interval": "30m"
+    },
+    {
+        "symbol": "DEFIUSDT",
+        "amount_min": 0.1,
+        "sl_interval": "2h",
+        "best_pnl": 1641.193869122114,
+        "average_pnl": 1381.5293914666802,
+        "worst_pnl": 1161.8524684242138,
+        "interval": "30m"
+    },
+    {
+        "symbol": "LRCUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "4h",
+        "best_pnl": 1638.906677491495,
+        "average_pnl": 1281.8273725598176,
+        "worst_pnl": 1103.1901393753208,
+        "interval": "30m"
+    },
+    {
+        "symbol": "MASKUSDT",
+        "amount_min": 0.001,
         "sl_interval": "1d",
-        "best_pnl": 1396.4885575943974,
-        "average_pnl": 1163.8993417376864,
-        "worst_pnl": 798.4798886113318,
+        "best_pnl": 1638.6640998089206,
+        "average_pnl": 1511.1944856170933,
+        "worst_pnl": 1221.3798364399468,
+        "interval": "30m"
+    },
+    {
+        "symbol": "OCEANUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "4h",
+        "best_pnl": 1635.6091779418584,
+        "average_pnl": 1419.0991812758696,
+        "worst_pnl": 1245.8824492532008,
+        "interval": "30m"
+    },
+    {
+        "symbol": "DENTUSDT",
+        "amount_min": 1e-06,
+        "sl_interval": "4h",
+        "best_pnl": 1622.8674899076298,
+        "average_pnl": 1434.6954254581706,
+        "worst_pnl": 1240.3425954572822,
+        "interval": "30m"
+    },
+    {
+        "symbol": "FTMUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "6h",
+        "best_pnl": 1622.6385906336764,
+        "average_pnl": 1358.3411501054136,
+        "worst_pnl": 1158.9190965072435,
+        "interval": "30m"
+    },
+    {
+        "symbol": "API3USDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1617.813003700668,
+        "average_pnl": 1295.3249268547015,
+        "worst_pnl": 953.7324018299782,
+        "interval": "30m"
+    },
+    {
+        "symbol": "LINAUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1613.6960029999707,
+        "average_pnl": 1422.420126984103,
+        "worst_pnl": 1298.2246922606898,
+        "interval": "30m"
+    },
+    {
+        "symbol": "IMXUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1593.8110088587975,
+        "average_pnl": 1378.7426822336909,
+        "worst_pnl": 1283.2632006441079,
         "interval": "30m"
     },
     {
         "symbol": "GMTUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1389.829139937205,
-        "average_pnl": 1061.3985902887216,
-        "worst_pnl": 714.4749554565112,
-        "interval": "15m"
-    },
-    {
-        "symbol": "STORJUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1387.3576738777347,
-        "average_pnl": 942.2696502995194,
-        "worst_pnl": 212.7314545905721,
-        "interval": "15m"
-    },
-    {
-        "symbol": "HBARUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "4h",
-        "best_pnl": 1384.2925373029177,
-        "average_pnl": 1184.055155486671,
-        "worst_pnl": 989.565433970875,
-        "interval": "15m"
-    },
-    {
-        "symbol": "KLAYUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1381.5265480531862,
-        "average_pnl": 1141.0658393380318,
-        "worst_pnl": 930.2530268132865,
-        "interval": "1h"
-    },
-    {
-        "symbol": "COTIUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1381.0806899237077,
-        "average_pnl": 1134.5337935177054,
-        "worst_pnl": 787.0957653246285,
+        "sl_interval": "6h",
+        "best_pnl": 1587.7772239858914,
+        "average_pnl": 1212.1426029231313,
+        "worst_pnl": 703.4203347302723,
         "interval": "30m"
     },
     {
-        "symbol": "ATAUSDT",
-        "amount_min": 0.0001,
+        "symbol": "GTCUSDT",
+        "amount_min": 0.001,
         "sl_interval": "12h",
-        "best_pnl": 1380.43890703123,
-        "average_pnl": 996.8870121324713,
-        "worst_pnl": 656.6914211043568,
-        "interval": "15m"
+        "best_pnl": 1571.5423198652422,
+        "average_pnl": 1493.5384430675088,
+        "worst_pnl": 1415.8235478349727,
+        "interval": "30m"
+    },
+    {
+        "symbol": "KSMUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "2h",
+        "best_pnl": 1568.7258602801153,
+        "average_pnl": 1268.9507782753435,
+        "worst_pnl": 1117.6913691557031,
+        "interval": "30m"
+    },
+    {
+        "symbol": "MANAUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "4h",
+        "best_pnl": 1567.315069717542,
+        "average_pnl": 1200.3517873371247,
+        "worst_pnl": 1049.780055427092,
+        "interval": "30m"
+    },
+    {
+        "symbol": "BANDUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1553.6343467087363,
+        "average_pnl": 1228.5990826417667,
+        "worst_pnl": 1111.1546051043172,
+        "interval": "30m"
     },
     {
         "symbol": "YFIUSDT",
         "amount_min": 1.0,
-        "sl_interval": "6h",
-        "best_pnl": 1374.4273816710127,
-        "average_pnl": 949.7082494530611,
-        "worst_pnl": 461.0534346032423,
+        "sl_interval": "2h",
+        "best_pnl": 1553.4129894947846,
+        "average_pnl": 1212.6804731877676,
+        "worst_pnl": 964.371303852774,
         "interval": "30m"
     },
     {
-        "symbol": "DOGEUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1374.3994485992096,
-        "average_pnl": 1071.281276282588,
-        "worst_pnl": 878.2652629959316,
-        "interval": "1h"
+        "symbol": "AAVEUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "4h",
+        "best_pnl": 1553.3559408621104,
+        "average_pnl": 1216.8265467105427,
+        "worst_pnl": 960.9405360229707,
+        "interval": "30m"
     },
     {
-        "symbol": "EOSUSDT",
+        "symbol": "ZECUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "2h",
+        "best_pnl": 1549.664071458612,
+        "average_pnl": 1263.8858421010902,
+        "worst_pnl": 1144.748409145923,
+        "interval": "30m"
+    },
+    {
+        "symbol": "XMRUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "2h",
+        "best_pnl": 1544.5502946642112,
+        "average_pnl": 1166.5791600977325,
+        "worst_pnl": 1028.0611126894837,
+        "interval": "30m"
+    },
+    {
+        "symbol": "OMGUSDT",
         "amount_min": 0.001,
-        "sl_interval": "8h",
-        "best_pnl": 1370.6373740237364,
-        "average_pnl": 1102.5896933343965,
-        "worst_pnl": 925.8590687486039,
+        "sl_interval": "2h",
+        "best_pnl": 1543.3840059824852,
+        "average_pnl": 1385.194521921324,
+        "worst_pnl": 1279.9981966139164,
+        "interval": "30m"
+    },
+    {
+        "symbol": "RAYUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1533.7817951428278,
+        "average_pnl": 1106.9233618187536,
+        "worst_pnl": 923.8185494430015,
+        "interval": "30m"
+    },
+    {
+        "symbol": "NEARUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "4h",
+        "best_pnl": 1519.27361879339,
+        "average_pnl": 1262.611072659022,
+        "worst_pnl": 1060.962162809269,
+        "interval": "30m"
+    },
+    {
+        "symbol": "1000SHIBUSDT",
+        "amount_min": 1e-06,
+        "sl_interval": "4h",
+        "best_pnl": 1517.914477549513,
+        "average_pnl": 1311.6939186050588,
+        "worst_pnl": 941.1061307030526,
+        "interval": "30m"
+    },
+    {
+        "symbol": "HNTUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1516.8036418457123,
+        "average_pnl": 1381.0340394161103,
+        "worst_pnl": 1281.6934754214672,
+        "interval": "30m"
+    },
+    {
+        "symbol": "DARUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "4h",
+        "best_pnl": 1516.3624729537298,
+        "average_pnl": 1291.488034275305,
+        "worst_pnl": 1144.9671938134397,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ICXUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "4h",
+        "best_pnl": 1513.7804850092539,
+        "average_pnl": 1370.1411911773266,
+        "worst_pnl": 1180.517363671885,
+        "interval": "30m"
+    },
+    {
+        "symbol": "KAVAUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1511.7683188652643,
+        "average_pnl": 1294.0052684112727,
+        "worst_pnl": 1177.8764907075583,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ENJUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1510.6332317145095,
+        "average_pnl": 1353.4982452229272,
+        "worst_pnl": 1189.1193866250378,
+        "interval": "30m"
+    },
+    {
+        "symbol": "BCHUSDT",
+        "amount_min": 0.01,
+        "interval": "30m",
+        "sl_interval": "12h",
+        "best_pnl": 1507.2370946246367,
+        "average_pnl": 1382.1830481636691,
+        "worst_pnl": 1262.0470648894247
+    },
+    {
+        "symbol": "RUNEUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1501.8585355738105,
+        "average_pnl": 1116.7707360249487,
+        "worst_pnl": 854.4004801204525,
+        "interval": "30m"
+    },
+    {
+        "symbol": "SXPUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "4h",
+        "best_pnl": 1501.3006312598864,
+        "average_pnl": 1284.9590512058521,
+        "worst_pnl": 1111.3602044529803,
+        "interval": "30m"
+    },
+    {
+        "symbol": "CELOUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1500.776730661604,
+        "average_pnl": 1282.4785876702738,
+        "worst_pnl": 1178.86911861808,
+        "interval": "30m"
+    },
+    {
+        "symbol": "CHZUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1498.5962293385812,
+        "average_pnl": 1369.7760761071293,
+        "worst_pnl": 1291.55825826755,
+        "interval": "30m"
+    },
+    {
+        "symbol": "PEOPLEUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "4h",
+        "best_pnl": 1490.5661657820212,
+        "average_pnl": 1359.3679144520868,
+        "worst_pnl": 1297.8421633261062,
+        "interval": "30m"
+    },
+    {
+        "symbol": "VETUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1486.9237331537468,
+        "average_pnl": 1362.1133445396235,
+        "worst_pnl": 1223.2968406673576,
+        "interval": "30m"
+    },
+    {
+        "symbol": "IOTXUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "4h",
+        "best_pnl": 1479.122787196137,
+        "average_pnl": 1240.3459161803685,
+        "worst_pnl": 1051.1798572630291,
+        "interval": "30m"
+    },
+    {
+        "symbol": "AVAXUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "2h",
+        "best_pnl": 1478.0336520177195,
+        "average_pnl": 1193.5810125753462,
+        "worst_pnl": 1003.8614223129214,
         "interval": "30m"
     },
     {
         "symbol": "ALGOUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1367.3189349926863,
-        "average_pnl": 1186.6809007249105,
-        "worst_pnl": 961.7278345504825,
+        "sl_interval": "2h",
+        "best_pnl": 1467.8513450740502,
+        "average_pnl": 1329.0401502503516,
+        "worst_pnl": 1161.3000877781383,
         "interval": "30m"
     },
     {
-        "symbol": "ONTUSDT",
+        "symbol": "CHRUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1365.312625419089,
-        "average_pnl": 1091.6662224925817,
-        "worst_pnl": 942.327796337761,
-        "interval": "15m"
+        "sl_interval": "4h",
+        "best_pnl": 1467.5544940035809,
+        "average_pnl": 1414.1862065478833,
+        "worst_pnl": 1370.9775646956723,
+        "interval": "30m"
     },
     {
-        "symbol": "ARUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1365.298387868228,
-        "average_pnl": 943.147578427601,
-        "worst_pnl": 642.6210992880657,
-        "interval": "1h"
-    },
-    {
-        "symbol": "FLOWUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1357.340260415692,
-        "average_pnl": 1092.3387736141449,
-        "worst_pnl": 853.3273212599898,
-        "interval": "15m"
-    },
-    {
-        "symbol": "MATICUSDT",
+        "symbol": "ZRXUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1350.484181303005,
-        "average_pnl": 1067.330404993763,
-        "worst_pnl": 808.8366512241448,
+        "sl_interval": "2h",
+        "best_pnl": 1464.6198078138616,
+        "average_pnl": 1213.161418518977,
+        "worst_pnl": 1089.1490646563948,
         "interval": "30m"
     },
     {
         "symbol": "IOSTUSDT",
         "amount_min": 1e-06,
         "sl_interval": "12h",
-        "best_pnl": 1348.142453705883,
-        "average_pnl": 1105.1352268505293,
-        "worst_pnl": 924.7226460365689,
+        "best_pnl": 1459.1845115338056,
+        "average_pnl": 1374.0330298153815,
+        "worst_pnl": 1249.7418247850246,
         "interval": "30m"
     },
     {
-        "symbol": "API3USDT",
+        "symbol": "NEOUSDT",
         "amount_min": 0.001,
-        "sl_interval": "6h",
-        "best_pnl": 1347.6533664155038,
-        "average_pnl": 1102.817100400053,
-        "worst_pnl": 762.794771876209,
+        "sl_interval": "2h",
+        "best_pnl": 1453.898085889266,
+        "average_pnl": 1293.2292219423944,
+        "worst_pnl": 1182.3404791911657,
         "interval": "30m"
     },
     {
-        "symbol": "ZRXUSDT",
+        "symbol": "KLAYUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "12h",
-        "best_pnl": 1346.6094283514542,
-        "average_pnl": 1074.7613311436799,
-        "worst_pnl": 828.7321487366564,
-        "interval": "15m"
-    },
-    {
-        "symbol": "ALICEUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1346.2957972789347,
-        "average_pnl": 1046.1680973987507,
-        "worst_pnl": 857.6088588207432,
+        "sl_interval": "2h",
+        "best_pnl": 1450.6814375189113,
+        "average_pnl": 1277.1695095414595,
+        "worst_pnl": 1209.7364473746532,
         "interval": "30m"
     },
     {
-        "symbol": "MKRUSDT",
-        "amount_min": 0.1,
-        "sl_interval": "4h",
-        "best_pnl": 1333.3383641548014,
-        "average_pnl": 1037.8440771111234,
-        "worst_pnl": 784.4920873152697,
-        "interval": "15m"
-    },
-    {
-        "symbol": "1INCHUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1318.470720273987,
-        "average_pnl": 1014.896290084166,
-        "worst_pnl": 802.6506480623547,
-        "interval": "30m"
-    },
-    {
-        "symbol": "AVAXUSDT",
-        "amount_min": 0.01,
-        "sl_interval": "1d",
-        "best_pnl": 1314.783391615504,
-        "average_pnl": 1075.8302107135858,
-        "worst_pnl": 807.0848111963777,
-        "interval": "1h"
-    },
-    {
-        "symbol": "FTTUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1310.400217788026,
-        "average_pnl": 1075.191173686623,
-        "worst_pnl": 804.4084748400195,
+        "symbol": "ANKRUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "8h",
+        "best_pnl": 1449.9744565042845,
+        "average_pnl": 1375.5129475281447,
+        "worst_pnl": 1295.07041934665,
         "interval": "30m"
     },
     {
         "symbol": "AXSUSDT",
         "amount_min": 0.01,
-        "sl_interval": "1d",
-        "best_pnl": 1309.0614452423074,
-        "average_pnl": 1092.8133100800978,
-        "worst_pnl": 786.7166588337195,
+        "sl_interval": "2h",
+        "best_pnl": 1449.6263713171145,
+        "average_pnl": 1214.3973718051627,
+        "worst_pnl": 1022.2331161107875,
         "interval": "30m"
     },
     {
-        "symbol": "KSMUSDT",
-        "amount_min": 0.01,
-        "sl_interval": "1d",
-        "best_pnl": 1305.8640307734706,
-        "average_pnl": 1127.0928921978114,
-        "worst_pnl": 904.0388920645063,
-        "interval": "30m"
-    },
-    {
-        "symbol": "ONEUSDT",
-        "amount_min": 1e-05,
+        "symbol": "HOTUSDT",
+        "amount_min": 1e-06,
         "sl_interval": "4h",
-        "best_pnl": 1303.6889719250826,
-        "average_pnl": 1077.63356624998,
-        "worst_pnl": 648.0946365925327,
-        "interval": "1h"
-    },
-    {
-        "symbol": "EGLDUSDT",
-        "amount_min": 0.01,
-        "sl_interval": "1d",
-        "best_pnl": 1295.6930818097026,
-        "average_pnl": 1049.3705671824948,
-        "worst_pnl": 764.4401675463059,
-        "interval": "15m"
-    },
-    {
-        "symbol": "SXPUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1288.6269483777912,
-        "average_pnl": 1047.263572292387,
-        "worst_pnl": 900.155125948859,
-        "interval": "15m"
-    },
-    {
-        "symbol": "DOTUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "8h",
-        "best_pnl": 1287.959698541854,
-        "average_pnl": 1115.2934162454412,
-        "worst_pnl": 962.29382047187,
+        "best_pnl": 1440.1762331305263,
+        "average_pnl": 1350.0453706722737,
+        "worst_pnl": 1222.5385502640177,
         "interval": "30m"
     },
     {
-        "symbol": "PEOPLEUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1287.7464341240725,
-        "average_pnl": 1091.9276770374997,
-        "worst_pnl": 844.4963911547985,
-        "interval": "15m"
-    },
-    {
-        "symbol": "MANAUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "12h",
-        "best_pnl": 1283.5032602813822,
-        "average_pnl": 1075.3605573591694,
-        "worst_pnl": 907.8902477485699,
-        "interval": "1h"
-    },
-    {
-        "symbol": "XMRUSDT",
-        "amount_min": 0.01,
-        "sl_interval": "1d",
-        "best_pnl": 1280.2367485079922,
-        "average_pnl": 984.9138509174063,
-        "worst_pnl": 793.5633068517931,
-        "interval": "15m"
-    },
-    {
-        "symbol": "ETCUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1278.0949827328693,
-        "average_pnl": 1138.3612550765763,
-        "worst_pnl": 900.0203464431996,
-        "interval": "15m"
-    },
-    {
-        "symbol": "NEOUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "6h",
-        "best_pnl": 1276.8792817741387,
-        "average_pnl": 1077.1354112024724,
-        "worst_pnl": 847.0254821139928,
+        "symbol": "REEFUSDT",
+        "amount_min": 1e-06,
+        "sl_interval": "4h",
+        "best_pnl": 1434.4602446307301,
+        "average_pnl": 1295.2871168099632,
+        "worst_pnl": 1222.8856476001147,
         "interval": "30m"
     },
     {
-        "symbol": "CELRUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "12h",
-        "best_pnl": 1276.5004783172592,
-        "average_pnl": 948.4571344525253,
-        "worst_pnl": 471.43432831526394,
-        "interval": "30m"
-    },
-    {
-        "symbol": "ZENUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1272.813073057758,
-        "average_pnl": 1087.4052239899909,
-        "worst_pnl": 899.189104421586,
-        "interval": "15m"
-    },
-    {
-        "symbol": "ICXUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1265.951849991619,
-        "average_pnl": 1102.9057054966243,
-        "worst_pnl": 897.8749957552384,
-        "interval": "30m"
-    },
-    {
-        "symbol": "LITUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "12h",
-        "best_pnl": 1262.49355246032,
-        "average_pnl": 937.7668812406589,
-        "worst_pnl": 607.707934255731,
-        "interval": "15m"
-    },
-    {
-        "symbol": "ENJUSDT",
+        "symbol": "ONTUSDT",
         "amount_min": 0.0001,
         "sl_interval": "2h",
-        "best_pnl": 1247.5187936599834,
-        "average_pnl": 1075.1554992734693,
-        "worst_pnl": 925.2912980901914,
-        "interval": "1h"
-    },
-    {
-        "symbol": "ADAUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1238.186384142314,
-        "average_pnl": 1102.9179104594718,
-        "worst_pnl": 988.3832066516392,
-        "interval": "15m"
-    },
-    {
-        "symbol": "DASHUSDT",
-        "amount_min": 0.01,
-        "sl_interval": "6h",
-        "best_pnl": 1236.3200061809418,
-        "average_pnl": 1054.3632914570321,
-        "worst_pnl": 851.506767596626,
+        "best_pnl": 1431.4923237537503,
+        "average_pnl": 1257.9393133011006,
+        "worst_pnl": 1175.9690288611966,
         "interval": "30m"
     },
     {
-        "symbol": "CTKUSDT",
+        "symbol": "ATOMUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1417.744116427227,
+        "average_pnl": 1070.4728641565823,
+        "worst_pnl": 869.8913331952247,
+        "interval": "30m"
+    },
+    {
+        "symbol": "FTTUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1417.06797626366,
+        "average_pnl": 1230.1838765080126,
+        "worst_pnl": 992.0255873492151,
+        "interval": "30m"
+    },
+    {
+        "symbol": "DOGEUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "12h",
+        "best_pnl": 1396.779626168288,
+        "average_pnl": 1265.8437386637033,
+        "worst_pnl": 1137.3407440184938,
+        "interval": "30m"
+    },
+    {
+        "symbol": "XLMUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "4h",
+        "best_pnl": 1390.5046638683755,
+        "average_pnl": 1324.6490081198033,
+        "worst_pnl": 1191.2437625097348,
+        "interval": "30m"
+    },
+    {
+        "symbol": "HBARUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1385.3438142719826,
+        "average_pnl": 1269.4291448573285,
+        "worst_pnl": 1199.0883294475811,
+        "interval": "30m"
+    },
+    {
+        "symbol": "EOSUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1380.0146405785563,
+        "average_pnl": 1320.4093147396973,
+        "worst_pnl": 1254.6131673186578,
+        "interval": "30m"
+    },
+    {
+        "symbol": "QTUMUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1379.7407588308818,
+        "average_pnl": 1276.5901993219989,
+        "worst_pnl": 1146.5547401642607,
+        "interval": "30m"
+    },
+    {
+        "symbol": "BATUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1232.5677163376624,
-        "average_pnl": 1064.2568385130778,
-        "worst_pnl": 901.1777117692952,
+        "sl_interval": "2h",
+        "best_pnl": 1372.062204427615,
+        "average_pnl": 1022.2944461565943,
+        "worst_pnl": 902.9522547447671,
         "interval": "30m"
     },
     {
         "symbol": "TRBUSDT",
         "amount_min": 0.01,
         "sl_interval": "1d",
-        "best_pnl": 1230.6734097081562,
-        "average_pnl": 1090.2767335249712,
-        "worst_pnl": 892.8117829553429,
-        "interval": "1h"
-    },
-    {
-        "symbol": "IOTXUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "4h",
-        "best_pnl": 1230.2235641283635,
-        "average_pnl": 1099.4388829672973,
-        "worst_pnl": 886.2802962503182,
+        "best_pnl": 1355.6770680318032,
+        "average_pnl": 1171.169027593174,
+        "worst_pnl": 1034.131475845143,
         "interval": "30m"
     },
     {
-        "symbol": "SOLUSDT",
-        "amount_min": 0.01,
+        "symbol": "DUSKUSDT",
+        "amount_min": 1e-05,
         "sl_interval": "4h",
-        "best_pnl": 1229.850080343442,
-        "average_pnl": 1003.516687885091,
-        "worst_pnl": 774.7101533317831,
+        "best_pnl": 1355.3270981020821,
+        "average_pnl": 1153.9333703846578,
+        "worst_pnl": 934.4604819883376,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ZENUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "8h",
+        "best_pnl": 1353.6626424428084,
+        "average_pnl": 1288.9552929709687,
+        "worst_pnl": 1209.9867826641487,
+        "interval": "30m"
+    },
+    {
+        "symbol": "FILUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1339.3440634336873,
+        "average_pnl": 1214.0883640257396,
+        "worst_pnl": 1065.2295896868404,
+        "interval": "30m"
+    },
+    {
+        "symbol": "TOMOUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "4h",
+        "best_pnl": 1337.6314959331057,
+        "average_pnl": 1220.4328129336213,
+        "worst_pnl": 1046.0365473808895,
+        "interval": "30m"
+    },
+    {
+        "symbol": "CVCUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "6h",
+        "best_pnl": 1335.0036292476134,
+        "average_pnl": 1284.5377371667184,
+        "worst_pnl": 1178.4394313954415,
+        "interval": "30m"
+    },
+    {
+        "symbol": "CTKUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "4h",
+        "best_pnl": 1331.3940963129405,
+        "average_pnl": 1146.8051128942604,
+        "worst_pnl": 1025.0391822660197,
+        "interval": "30m"
+    },
+    {
+        "symbol": "DASHUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "6h",
+        "best_pnl": 1326.9247678157897,
+        "average_pnl": 1252.1816322936872,
+        "worst_pnl": 1127.6327707267355,
         "interval": "30m"
     },
     {
         "symbol": "XEMUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "4h",
-        "best_pnl": 1220.963926886967,
-        "average_pnl": 933.8625538936857,
-        "worst_pnl": 646.1695707182133,
-        "interval": "1h"
+        "sl_interval": "6h",
+        "best_pnl": 1320.082582902972,
+        "average_pnl": 1233.8679495781619,
+        "worst_pnl": 1101.9457723023704,
+        "interval": "30m"
     },
     {
-        "symbol": "XLMUSDT",
+        "symbol": "ROSEUSDT",
         "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1210.5946122925757,
-        "average_pnl": 1044.9700112951134,
-        "worst_pnl": 901.0501705454608,
-        "interval": "30m"
-    },
-    {
-        "symbol": "UNFIUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1209.0729637722661,
-        "average_pnl": 766.345077022874,
-        "worst_pnl": 530.5786997724356,
-        "interval": "1h"
-    },
-    {
-        "symbol": "CRVUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1203.1054204324075,
-        "average_pnl": 994.1395374095454,
-        "worst_pnl": 792.3893787141097,
-        "interval": "30m"
-    },
-    {
-        "symbol": "WAVESUSDT",
-        "amount_min": 0.001,
         "sl_interval": "2h",
-        "best_pnl": 1201.083104477228,
-        "average_pnl": 845.7730424967727,
-        "worst_pnl": 92.05209930948061,
+        "best_pnl": 1308.0715480470428,
+        "average_pnl": 1224.242509849122,
+        "worst_pnl": 1111.771917191111,
         "interval": "30m"
     },
     {
         "symbol": "XRPUSDT",
         "amount_min": 0.0001,
         "sl_interval": "4h",
-        "best_pnl": 1200.3983129424353,
-        "average_pnl": 1007.7374201198462,
-        "worst_pnl": 793.3294588724638,
+        "best_pnl": 1295.6394027999647,
+        "average_pnl": 1162.394553237847,
+        "worst_pnl": 1040.103095116568,
         "interval": "30m"
     },
     {
-        "symbol": "TRXUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1196.5530409544592,
-        "average_pnl": 1103.796176195876,
-        "worst_pnl": 1005.9775770299706,
-        "interval": "15m"
-    },
-    {
-        "symbol": "BNXUSDT",
-        "amount_min": 0.01,
-        "sl_interval": "6h",
-        "best_pnl": 1191.4647325776775,
-        "average_pnl": 1070.711010348009,
-        "worst_pnl": 971.4647576207909,
-        "interval": "15m"
-    },
-    {
-        "symbol": "SRMUSDT",
-        "amount_min": 0.001,
+        "symbol": "IOTAUSDT",
+        "amount_min": 0.0001,
         "sl_interval": "8h",
-        "best_pnl": 1187.029148120329,
-        "average_pnl": 1043.8048301064432,
-        "worst_pnl": 864.4935021393038,
+        "best_pnl": 1274.7607865319367,
+        "average_pnl": 1204.7029885125478,
+        "worst_pnl": 1138.647007688924,
+        "interval": "30m"
+    },
+    {
+        "symbol": "XTZUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "2h",
+        "best_pnl": 1266.114724399582,
+        "average_pnl": 1183.4907527220432,
+        "worst_pnl": 1111.1192114361027,
+        "interval": "30m"
+    },
+    {
+        "symbol": "DOTUSDT",
+        "amount_min": 0.001,
+        "sl_interval": "1d",
+        "best_pnl": 1264.7305584940286,
+        "average_pnl": 1224.689484865966,
+        "worst_pnl": 1123.7153073124075,
         "interval": "30m"
     },
     {
         "symbol": "FLMUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1186.3109119084716,
-        "average_pnl": 781.2030617523237,
-        "worst_pnl": 525.8427264054678,
-        "interval": "1h"
+        "sl_interval": "4h",
+        "best_pnl": 1261.598518771853,
+        "average_pnl": 1108.98862753937,
+        "worst_pnl": 873.1122973610062,
+        "interval": "30m"
     },
     {
-        "symbol": "BNBUSDT",
+        "symbol": "ADAUSDT",
+        "amount_min": 0.0001,
+        "sl_interval": "2h",
+        "best_pnl": 1250.5256599121417,
+        "average_pnl": 1149.0309438078148,
+        "worst_pnl": 1039.2651630111413,
+        "interval": "30m"
+    },
+    {
+        "symbol": "BNXUSDT",
         "amount_min": 0.01,
-        "sl_interval": "6h",
-        "best_pnl": 1184.4145665799851,
-        "average_pnl": 1077.9073791397236,
-        "worst_pnl": 886.9305213012091,
+        "sl_interval": "4h",
+        "best_pnl": 1248.8849838638573,
+        "average_pnl": 1175.625383140504,
+        "worst_pnl": 1069.2354107663498,
         "interval": "30m"
     },
     {
-        "symbol": "CVCUSDT",
+        "symbol": "RVNUSDT",
         "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1168.1529363317848,
-        "average_pnl": 1021.904030151943,
-        "worst_pnl": 812.3238005518165,
+        "sl_interval": "4h",
+        "best_pnl": 1246.063229213619,
+        "average_pnl": 1085.5127037800735,
+        "worst_pnl": 965.1376105907715,
         "interval": "30m"
     },
     {
-        "symbol": "CELOUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1160.8680987398263,
-        "average_pnl": 1014.9100483671521,
-        "worst_pnl": 671.9561084658529,
-        "interval": "1h"
+        "symbol": "EGLDUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "2h",
+        "best_pnl": 1232.8859721563144,
+        "average_pnl": 980.0057640304591,
+        "worst_pnl": 800.2774605476382,
+        "interval": "30m"
+    },
+    {
+        "symbol": "BTCUSDT",
+        "amount_min": 0.1,
+        "sl_interval": "6h",
+        "best_pnl": 1220.1820793790218,
+        "average_pnl": 1173.1581935387794,
+        "worst_pnl": 1105.0994558300868,
+        "interval": "30m"
+    },
+    {
+        "symbol": "TRXUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "4h",
+        "best_pnl": 1174.8703805290027,
+        "average_pnl": 1102.599224992846,
+        "worst_pnl": 1029.7611759345032,
+        "interval": "30m"
+    },
+    {
+        "symbol": "STMXUSDT",
+        "amount_min": 1e-05,
+        "sl_interval": "2h",
+        "best_pnl": 1154.1773844620882,
+        "average_pnl": 903.6107645104903,
+        "worst_pnl": 828.1282600132852,
+        "interval": "30m"
     },
     {
         "symbol": "BTCDOMUSDT",
         "amount_min": 0.1,
-        "sl_interval": "4h",
-        "best_pnl": 1157.395493107818,
-        "average_pnl": 1070.9631151800077,
-        "worst_pnl": 955.0736466441223,
-        "interval": "15m"
+        "sl_interval": "2h",
+        "best_pnl": 1139.0804863907185,
+        "average_pnl": 1089.254084752953,
+        "worst_pnl": 1051.0360636854796,
+        "interval": "30m"
     },
     {
-        "symbol": "RAYUSDT",
+        "symbol": "BNBUSDT",
+        "amount_min": 0.01,
+        "sl_interval": "1d",
+        "best_pnl": 1134.6768535456094,
+        "average_pnl": 1071.8891550472315,
+        "worst_pnl": 893.6834396594912,
+        "interval": "30m"
+    },
+    {
+        "symbol": "ANTUSDT",
         "amount_min": 0.001,
-        "sl_interval": "6h",
-        "best_pnl": 1154.5354628556308,
-        "average_pnl": 928.4603809361264,
-        "worst_pnl": 642.9049493959668,
+        "sl_interval": "2h",
+        "best_pnl": 1108.9860707543012,
+        "average_pnl": 1032.4053483674454,
+        "worst_pnl": 969.7529213089283,
         "interval": "30m"
     },
     {
-        "symbol": "SANDUSDT",
+        "symbol": "SFPUSDT",
         "amount_min": 0.0001,
-        "sl_interval": "12h",
-        "best_pnl": 1146.895580314161,
-        "average_pnl": 947.7467818862074,
-        "worst_pnl": 741.944713943342,
-        "interval": "15m"
-    },
-    {
-        "symbol": "DUSKUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "1d",
-        "best_pnl": 1131.0609952037448,
-        "average_pnl": 946.7478982066659,
-        "worst_pnl": 658.6016076537817,
-        "interval": "30m"
-    },
-    {
-        "symbol": "ZILUSDT",
-        "amount_min": 1e-05,
-        "sl_interval": "6h",
-        "best_pnl": 1122.1307456184468,
-        "average_pnl": 840.0418659975418,
-        "worst_pnl": 432.5922285555735,
-        "interval": "30m"
-    },
-    {
-        "symbol": "BATUSDT",
-        "amount_min": 0.0001,
-        "sl_interval": "1d",
-        "best_pnl": 1105.0786762983598,
-        "average_pnl": 906.4691286489292,
-        "worst_pnl": 738.4423896028317,
-        "interval": "1h"
-    },
-    {
-        "symbol": "SNXUSDT",
-        "amount_min": 0.001,
-        "sl_interval": "1d",
-        "best_pnl": 1051.6707716395895,
-        "average_pnl": 645.9470841102562,
-        "worst_pnl": -283.7752420985603,
+        "sl_interval": "2h",
+        "best_pnl": 1108.367691255114,
+        "average_pnl": 1023.8392954636735,
+        "worst_pnl": 986.0465367680554,
         "interval": "30m"
     },
     {

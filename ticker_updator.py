@@ -204,7 +204,8 @@ class TickerUpdator(metaclass=ABCMeta):
     def start(self, simulate=0):
         self.is_simulate = True
 
-        interval_arr = ['15m', '30m', '1h']
+        # interval_arr = ['15m', '30m', '1h']
+        interval_arr = ['30m']
         sl_interval_arr = ['1d', '12h', '8h', '6h', '4h', '2h']
         logs = ""
 
@@ -213,9 +214,9 @@ class TickerUpdator(metaclass=ABCMeta):
             result = []
             self.position_data.append(data)
 
-            data['df_15m'] = self.book.generate_chart_data(data['symbol'], '15m', simulate * 2 + 100)
+            # data['df_15m'] = self.book.generate_chart_data(data['symbol'], '15m', simulate * 2 + 100)
             data['df_30m'] = self.book.generate_chart_data(data['symbol'], '30m', simulate + 100)
-            data['df_1h'] = self.book.generate_chart_data(data['symbol'], '1h', int(simulate / 2) + 100)
+            # data['df_1h'] = self.book.generate_chart_data(data['symbol'], '1h', int(simulate / 2) + 100)
             data['df_2h'] = self.book.generate_chart_data(data['symbol'], '2h', int(simulate / 4) + 100)
             data['df_4h'] = self.book.generate_chart_data(data['symbol'], '4h', int(simulate / 8) + 100)
             data['df_6h'] = self.book.generate_chart_data(data['symbol'], '6h', int(simulate / 12) + 100)
@@ -405,7 +406,7 @@ class TickerUpdator(metaclass=ABCMeta):
                         })
 
             except Exception as e:
-                traceback.print_exc()
+                # traceback.print_exc()
                 data['interval'] = '30m'
                 data['sl_interval'] = '1d'
                 data['best_pnl'] = 0
@@ -477,9 +478,9 @@ class TickerUpdator(metaclass=ABCMeta):
         with open("tickers.json", "w") as json_file:
             json.dump(json_data, json_file, indent=4)
 
-        date_str = date.today().strftime("%Y_%d_%m_%H_%M")
-        copyfile('tickers.json', 'tickers_backup/tickers_%s.json' % date_str)
-        with open('logs/log_%s.json' % date_str, "w") as log_file:
+        date_str = date.today().strftime("%Y_%m_%d_%H_%M")
+        copyfile('tickers.json', 'tickers_backup/%s_tickers.json' % date_str)
+        with open('logs/%s_log.json' % date_str, "w") as log_file:
             log_file.write(logs)
 
     @staticmethod

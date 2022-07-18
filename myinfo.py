@@ -108,7 +108,7 @@ class MyInfo:
         params = {
             'stopPrice': limit,
         }
-        ret = self.exchange.create_order(symbol, 'TAKE_PROFIT_MARKET', 'sell' if isSell else 'buy', amount, 0, params)
+        ret = self.exchange.create_order(symbol, 'STOP_MARKET' if isSell else 'TAKE_PROFIT_MARKET', 'sell' if isSell else 'buy', amount, 0, params)
         # print(ret)
         return ret
 
