@@ -73,7 +73,7 @@ class OrderBook:
         df = pd.DataFrame(data=btc, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
         return df.iloc[-1]['close']
 
-    def generate_chart_data(self, symbol, timeframe='30m', limit=110):
+    def generate_chart_data(self, symbol, timeframe='30m', limit=110, includeLatest=False):
         df = pd.DataFrame(data=None, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
 
         since = int(time.time() * 1000)
@@ -102,7 +102,7 @@ class OrderBook:
                 break
 
         ms = time.time() * 1000.0
-        if timeframe == '1d' or ms - self.simulate_const[timeframe]['candle_thres'] < df.iloc[-1, 0]:
+        if not includeLatest and (timeframe == '1d' or ms - self.simulate_const[timeframe]['candle_thres'] < df.iloc[-1, 0]):
             df = df.iloc[:-1, :]
 
         df['date'] = pd.to_datetime(df['datetime'], unit='ms')
