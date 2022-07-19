@@ -166,7 +166,7 @@ class Bot(metaclass=ABCMeta):
 
             print('%s [%s] Long Close (TP/SL) - Size (%.4f USDT)' % (date, data['symbol'], gain_usdt))
             print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-            self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Long 종료%s - Size (%.4f USDT -> %.4f USDT)' % (' (Take Profit)', used_usdt, gain_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
+            self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Long 종료 (Stop Market)', 'Size (%.4f USDT -> %.4f USDT)' % (used_usdt, gain_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
 
         elif data['position'] == 'Short':
             gained_usdt = data['amount'] * data['entry'] / self.info.leverage
@@ -175,7 +175,7 @@ class Bot(metaclass=ABCMeta):
 
             print('%s [%s] Short Close (TP/SL) - Size (%.4f USDT)' % (date, data['symbol'], using_usdt))
             print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-            self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Short 종료%s - Size (%.4f USDT -> %.4f USDT)' % (' (Take Profit)', gained_usdt, using_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
+            self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Short 종료 (Stop Market)', 'Size (%.4f USDT -> %.4f USDT)' % (gained_usdt, using_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
 
     def waitUntilOrderDone(self, order_id, symbol):
         if self.is_simulate:
