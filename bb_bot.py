@@ -548,8 +548,8 @@ class Bot(metaclass=ABCMeta):
                             data['pnl'] = (price - data['entry']) * data['amount']
 
                         # 종료 체크
-                        now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         low_bb = candle_sl['low'] < candle_sl['bb_l']
+                        now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
                         if data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h']:  # fever mode
                             data['tp_price'] = data['tp_price_best'] = 0
@@ -625,8 +625,8 @@ class Bot(metaclass=ABCMeta):
                             data['pnl'] = (data['entry'] - price) * data['amount']
 
                         # 종료 체크
-                        now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         high_bb = candle_sl['high'] > candle_sl['bb_h']
+                        now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
                         if data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l']:  # fever mode
                             data['tp_price'] = data['tp_price_best'] = 0
@@ -704,16 +704,18 @@ class Bot(metaclass=ABCMeta):
                     using_usdt = self.balance['total'] * self.entry_amount_per
 
                     fever_long = data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h']
+                    long_entry_blocked = not data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l']
                     fever_short = data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l']
-                    if fever_long or candle_now['close'] < candle_now['bb_l']:
-                        reason = 'Fever)' if fever_long else ''
+                    short_entry_blocked = not data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h']
+                    if fever_long or (not long_entry_blocked and candle_now['close'] < candle_now['bb_l']):
+                        reason = '(Fever)' if fever_long else ''
                         price = candle_now['close'] + data['amount_min']
                         amount = using_usdt * self.info.leverage / price
                         self.buyOrder(data, amount, price)
 
                         print('%s [%s] Long Entry %s- Size (%.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 진입 %s' % reason, 'Size (%.4f USDT / %.4f USDT)' % (using_usdt, self.balance['total']))
-                    elif fever_short or candle_now['close'] > candle_now['bb_h']:
+                    elif fever_short or (not short_entry_blocked and candle_now['close'] > candle_now['bb_h']):
                         reason = '(Fever)' if fever_short else ''
                         price = candle_now['close'] - data['amount_min']
                         amount = using_usdt * self.info.leverage / price
