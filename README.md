@@ -32,12 +32,11 @@ config 파일 내 telegram_id 부분에 텔레그램 id 넣기 <br />
 <li>진입 조건</li>
 <ul>
 <li>30분 캔들 종가가 볼린저밴드 하단 아래일 경우 다음봉 시가에 시장가매수 (10%)</li>
-<ul>
-<li>직전 BTC 8h/ETH 6h/BCH 8h 캔들 기준 low 값이 볼린저밴드 하단 아래일 경우 하락장이라고 판단하여 롱 진입하지 않음</li>
-</ul>
+<li>직전/현재 BTC 8h/ETH 6h/BCH 8h 캔들 기준 high 값이 볼린저밴드 상단 위로 솟은 경우 다음봉 시가에 시장가매수 (10%) (Fever mode)</li>
 </ul>
 <li>if 수익</li>
 <ul>
+<li>직전 BTC 8h/ETH 6h/BCH 8h 캔들 기준 high 값이 볼린저밴드 상단 위로 솟은 경우 계속 홀딩</li>
 <li>close 값이 볼린저밴드 상단의 4/5 이상일 시 전부 시장가 매도</li>
 <li>만약 위 조건에서 VBB가 상단을 돌파 한 경우 매도를 보류하고 Take profit market을 볼린저밴드 상단의 4/5 지점에 설정후 대기, 이후 아래 케이스에 맞게 동작</li>
 <ul>

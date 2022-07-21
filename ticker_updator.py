@@ -248,17 +248,18 @@ class TickerUpdator(metaclass=ABCMeta):
                             candle_now = self.createCandle(interval_df.iloc[-simulate_max + candle_count])
 
                             if sl_interval == '2h':
-                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 7200000].iloc[-1])
+                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 5400000].iloc[-1])
                             elif sl_interval == '4h':
-                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 14400000].iloc[-1])
+                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 12600000].iloc[-1])
                             elif sl_interval == '6h':
-                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 21600000].iloc[-1])
+                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 19800000].iloc[-1])
                             elif sl_interval == '8h':
-                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 28800000].iloc[-1])
+                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 27000000].iloc[-1])
                             elif sl_interval == '12h':
-                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 43200000].iloc[-1])
+                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 41400000].iloc[-1])
                             else:  # sl_interval == '1d':
-                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 54000000].iloc[-1])
+                                candle_sl = self.createCandle(sl_df.loc[sl_df['datetime'] <= candle_now['datetime'] - 52200000].iloc[-1])
+                            candle_sl_now = candle_sl
 
                             if data['position'] == 'Long' and data['tp_price'] != 0 and candle_now['low'] <= data['tp_price']:
                                 self.checkSellOrderForSimulation(data, data['amount'], data['tp_price'] - data['amount_min'], candle_now['date'])
@@ -274,25 +275,25 @@ class TickerUpdator(metaclass=ABCMeta):
                                 now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                                 low_bb = candle_sl['low'] < candle_sl['bb_l']
                                 forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
-                                if forced_close_by_bb or now_clearing_price < candle_now['close'] or low_bb or data['tp_price'] != 0:
-                                    pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
-                                    if pending_by_volume:
-                                        data['tp_price'] = now_clearing_price
-                                        data['tp_price_best'] = candle_now['close']
+                                if candle_sl['high'] > candle_sl['bb_h']:  # fever mode
+                                    data['tp_price'] = data['tp_price_best'] = 0
+                                elif forced_close_by_bb or now_clearing_price < candle_now['close'] or low_bb or data['tp_price'] != 0:
+                                    if forced_close_by_bb or low_bb:
+                                        data['tp_price'] = data['tp_price_best'] = 0
+                                    else:
+                                        pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
+                                        if pending_by_volume:
+                                            data['tp_price'] = now_clearing_price
+                                            data['tp_price_best'] = candle_now['close']
 
-                                    update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] < candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
-                                    if update_tp_price:
-                                        data['tp_price'] = data['tp_price_best']
-                                        data['tp_price_best'] = candle_now['close']
+                                        update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] < candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
+                                        if update_tp_price:
+                                            data['tp_price'] = data['tp_price_best']
+                                            data['tp_price_best'] = candle_now['close']
 
                                     close_by_volume = data['tp_price'] != 0 and candle_now['volume'] <= candle_now['bb_vm']
 
                                     if data['tp_price'] == 0 or close_by_volume:
-                                        reason = ''
-                                        if forced_close_by_bb:
-                                            reason = '(BB 폭이 좁아져 강제 종료)'
-                                        elif low_bb:
-                                            reason = '(이전 %s 캔들이 BB 하단 돌파)' % sl_interval
                                         used_usdt = data['amount'] * data['entry'] / self.info.leverage
                                         gain_usdt = data['amount'] * price / self.info.leverage
                                         pnl = self.sellOrder(data, data['amount'], price)
@@ -327,33 +328,32 @@ class TickerUpdator(metaclass=ABCMeta):
                                 if self.is_simulate:
                                     data['pnl'] = (data['entry'] - price) * data['amount']
 
-                                # 종료 체크
-                                now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
-                                high_bb = candle_sl['high'] > candle_sl['bb_h']
-                                forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
-                                if forced_close_by_bb or now_clearing_price > candle_now['close'] or high_bb or data['tp_price'] != 0:
-                                    pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
-                                    if pending_by_volume:
-                                        data['tp_price'] = now_clearing_price
-                                        data['tp_price_best'] = candle_now['close']
+                                    # 종료 체크
+                                    now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
+                                    high_bb = candle_sl['high'] > candle_sl['bb_h']
+                                    forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
+                                    if candle_sl['low'] < candle_sl['bb_l']:  # fever mode
+                                        data['tp_price'] = data['tp_price_best'] = 0
+                                    elif forced_close_by_bb or now_clearing_price > candle_now['close'] or high_bb or data['tp_price'] != 0:
+                                        if forced_close_by_bb or high_bb:
+                                            data['tp_price'] = data['tp_price_best'] = 0
+                                        else:
+                                            pending_by_volume = data['tp_price'] == 0 and candle_now['volume'] >= candle_now['bb_vh']
+                                            if pending_by_volume:
+                                                data['tp_price'] = now_clearing_price
+                                                data['tp_price_best'] = candle_now['close']
 
-                                    update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] > candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
-                                    if update_tp_price:
-                                        data['tp_price'] = data['tp_price_best']
-                                        data['tp_price_best'] = candle_now['close']
+                                            update_tp_price = data['tp_price'] != 0 and data['tp_price_best'] > candle_now['close'] and candle_now['volume'] >= candle_now['bb_vh']
+                                            if update_tp_price:
+                                                data['tp_price'] = data['tp_price_best']
+                                                data['tp_price_best'] = candle_now['close']
 
-                                    close_by_volume = data['tp_price'] != 0 and candle_now['volume'] <= candle_now['bb_vm']
+                                        close_by_volume = data['tp_price'] != 0 and candle_now['volume'] <= candle_now['bb_vm']
 
-                                    if data['tp_price'] == 0 or close_by_volume:
-                                        reason = ''
-                                        if forced_close_by_bb:
-                                            reason = '(BB 폭이 좁아져 강제 종료)'
-                                        elif high_bb:
-                                            reason = '(이전 %s 캔들이 BB 상단 돌파)' % sl_interval
-
-                                        gained_usdt = data['amount'] * data['entry'] / self.info.leverage
-                                        using_usdt = data['amount'] * price / self.info.leverage
-                                        pnl = self.buyOrder(data, data['amount'], price)
+                                        if data['tp_price'] == 0 or close_by_volume:
+                                            gained_usdt = data['amount'] * data['entry'] / self.info.leverage
+                                            using_usdt = data['amount'] * price / self.info.leverage
+                                            pnl = self.buyOrder(data, data['amount'], price)
                                 else:
                                     chasing_reason = ''
                                     # 물타기 체크
@@ -385,12 +385,12 @@ class TickerUpdator(metaclass=ABCMeta):
                             if data['position'] is None:
                                 using_usdt = self.balance['total'] * self.entry_amount_per
 
-                                if candle_sl['low'] >= candle_sl['bb_l'] and candle_now['close'] < candle_now['bb_l']:
+                                if candle_sl['high'] > candle_sl['bb_h'] or candle_sl_now['high'] > candle_sl_now['bb_h'] or candle_now['close'] < candle_now['bb_l']:
                                     price = candle_now['close'] + data['amount_min']
                                     amount = using_usdt * self.info.leverage / price
                                     self.buyOrder(data, amount, price)
 
-                                elif candle_sl['high'] <= candle_sl['bb_h'] and candle_now['close'] > candle_now['bb_h']:
+                                elif candle_sl['low'] < candle_sl['bb_l'] or candle_sl_now['low'] < candle_sl_now['bb_l'] or candle_now['close'] > candle_now['bb_h']:
                                     price = candle_now['close'] - data['amount_min']
                                     amount = using_usdt * self.info.leverage / price
                                     self.sellOrder(data, amount, price)
@@ -478,7 +478,7 @@ class TickerUpdator(metaclass=ABCMeta):
         with open("tickers.json", "w") as json_file:
             json.dump(json_data, json_file, indent=4)
 
-        date_str = date.today().strftime("%Y_%m_%d_%H_%M")
+        date_str = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
         copyfile('tickers.json', 'tickers_backup/%s_tickers.json' % date_str)
         with open('logs/%s_log.json' % date_str, "w") as log_file:
             log_file.write(logs)

@@ -26,31 +26,36 @@ class Bot(metaclass=ABCMeta):
             "symbol": "BTCUSDT",
             "amount_min": 0.1,
             "sl_interval": "8h",
-            "interval": "30m"
+            "interval": "30m",
+            "fever_mode": True
         },
         {
             "symbol": "ETHUSDT",
             "amount_min": 0.01,
             "sl_interval": "6h",
-            "interval": "30m"
+            "interval": "30m",
+            "fever_mode": True
         },
         {
             "symbol": "BCHUSDT",
             "amount_min": 0.01,
             "sl_interval": "8h",
-            "interval": "30m"
+            "interval": "30m",
+            "fever_mode": True
         },
         {
             "symbol": "ETCUSDT",
             "amount_min": 0.001,
             "sl_interval": "2h",
-            "interval": "30m"
+            "interval": "30m",
+            "fever_mode": False
         },
         {
             "symbol": "LTCUSDT",
             "amount_min": 0.01,
             "sl_interval": "4h",
-            "interval": "30m"
+            "interval": "30m",
+            "fever_mode": False
         },
     ]
     simulate_const = {
@@ -508,7 +513,6 @@ class Bot(metaclass=ABCMeta):
                     candle_prev = self.createCandle(data['df_interval'].iloc[candle_idx - 1])
                     candle_now = self.createCandle(data['df_interval'].iloc[candle_idx])
                     candle_sl = self.createCandle(data['df_sl_interval'].loc[data['df_sl_interval']['datetime'] <= candle_now['datetime'] - self.simulate_const[data['sl_interval']]['candle_offset']].iloc[-1])
-                    candle_sl_now = candle_sl
                 else:
                     minute = datetime.datetime.now().minute
                     if data['chasing_amount'] > 0 or data['chasing_remain'] > 0:
@@ -520,12 +524,11 @@ class Bot(metaclass=ABCMeta):
                         continue
 
                     df_interval = self.book.generate_chart_data(data['symbol'], data['interval'])
-                    df_sl = self.book.generate_chart_data(data['symbol'], data['sl_interval'], includeLatest=True)
+                    df_sl = self.book.generate_chart_data(data['symbol'], data['sl_interval'])
 
                     candle_prev = self.createCandle(df_interval.iloc[-2])
                     candle_now = self.createCandle(df_interval.iloc[-1])
-                    candle_sl = self.createCandle(df_sl.iloc[-2])
-                    candle_sl_now = self.createCandle(df_sl.iloc[-1])
+                    candle_sl = self.createCandle(df_sl.iloc[-1])
 
                     print("- Log [%s]" % data['symbol'])
                     print('    candle %s' % candle_now)
@@ -548,7 +551,7 @@ class Bot(metaclass=ABCMeta):
                         now_clearing_price = candle_now['bb_l'] + (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         low_bb = candle_sl['low'] < candle_sl['bb_l']
                         forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
-                        if candle_sl['high'] > candle_sl['bb_h']:  # fever mode
+                        if data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h']:  # fever mode
                             data['tp_price'] = data['tp_price_best'] = 0
                         elif forced_close_by_bb or now_clearing_price < candle_now['close'] or low_bb or data['tp_price'] != 0:
                             if forced_close_by_bb or low_bb:
@@ -625,7 +628,7 @@ class Bot(metaclass=ABCMeta):
                         now_clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                         high_bb = candle_sl['high'] > candle_sl['bb_h']
                         forced_close_by_bb = data['position_length'] >= self.forced_close_min_length and (candle_now['bb_h'] - candle_now['bb_l']) / candle_now['bb_m'] < self.forced_close_bb_length_thres_per
-                        if candle_sl['low'] < candle_sl['bb_l']:  # fever mode
+                        if data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l']:  # fever mode
                             data['tp_price'] = data['tp_price_best'] = 0
                         elif forced_close_by_bb or now_clearing_price > candle_now['close'] or high_bb or data['tp_price'] != 0:
                             if forced_close_by_bb or high_bb:
@@ -674,7 +677,7 @@ class Bot(metaclass=ABCMeta):
                                 chasing_reason += 'R'
 
                             if chasing_reason != '':
-                                clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height + 0.00
+                                clearing_price = candle_now['bb_h'] - (candle_now['bb_h'] - candle_now['bb_l']) * self.close_position_threshold_bb_height
                                 if clearing_price > data['entry']:
                                     # (평단가 * 현재 개수 + 지금 가격 * x개) * 99% = 정리 가격 * (현재 개수 + x개)
                                     chasing_amount = (clearing_price - data['entry'] * (1 - self.chasing_target_profit)) * data['amount'] / (candle_now['close'] * (1 - self.chasing_target_profit) - clearing_price)
@@ -700,21 +703,23 @@ class Bot(metaclass=ABCMeta):
                 if data['position'] is None and data['enabled']:
                     using_usdt = self.balance['total'] * self.entry_amount_per
 
-                    if candle_sl['high'] > candle_sl['bb_h'] or candle_sl_now['high'] > candle_sl_now['bb_h'] or candle_now['close'] < candle_now['bb_l']:
-                        reason = '' if candle_now['close'] < candle_now['bb_l'] else '(Fever)'
+                    fever_long = data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h']
+                    fever_short = data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l']
+                    if fever_long or candle_now['close'] < candle_now['bb_l']:
+                        reason = 'Fever)' if fever_long else ''
                         price = candle_now['close'] + data['amount_min']
                         amount = using_usdt * self.info.leverage / price
                         self.buyOrder(data, amount, price)
 
-                        print('%s [%s] Long Entry - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt))
+                        print('%s [%s] Long Entry %s- Size (%.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 진입 %s' % reason, 'Size (%.4f USDT / %.4f USDT)' % (using_usdt, self.balance['total']))
-                    elif candle_sl['low'] < candle_sl['bb_l'] or candle_sl_now['low'] < candle_sl_now['bb_l'] or candle_now['close'] > candle_now['bb_h']:
-                        reason = '' if candle_now['close'] > candle_now['bb_h'] else '(Fever)'
+                    elif fever_short or candle_now['close'] > candle_now['bb_h']:
+                        reason = '(Fever)' if fever_short else ''
                         price = candle_now['close'] - data['amount_min']
                         amount = using_usdt * self.info.leverage / price
                         self.sellOrder(data, amount, price)
 
-                        print('%s [%s] Short Entry - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], using_usdt))
+                        print('%s [%s] Short Entry %s- Size (%.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 진입 %s' % reason, 'Size (%.4f USDT / %.4f USDT)' % (using_usdt, self.balance['total']))
 
                 # TAKE_PROFIT_MARKET 오더 오픈
@@ -736,7 +741,7 @@ class Bot(metaclass=ABCMeta):
                 if not data['enabled']:
                     continue
                 if False and data['position'] is not None:
-                    # print('[%s] unrealized pnl %.4f' % (data['symbol'], data['pnl']))
+                    print('[%s] unrealized pnl %.4f' % (data['symbol'], data['pnl']))
                     self.balance['total'] += data['pnl']
 
                 total_tx = data['win'] + data['lose']
