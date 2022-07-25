@@ -473,6 +473,7 @@ class Bot(metaclass=ABCMeta):
             data['position'] = None
             data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['win'] = data['lose'] = data['profit'] = data['loss'] = data['commission'] = data['position_length'] = data['chasing_amount'] = data['chasing_remain'] = data['tp_price'] = data['tp_price_best'] = 0
             data['closing_length'] = {}
+            data['input'] = 1 if data['symbol'] not in self.info.input else self.info.input[data['symbol']]
             self.updatePositions(data)
             if data['position'] is not None or data['enabled']:
                 print('    [%s] Position (%s), Size (%.4f USDT)' % (data['symbol'], data['position'], data['using']))
@@ -605,14 +606,14 @@ class Bot(metaclass=ABCMeta):
                                     # (평단가 * 현재 개수 + 지금 가격 * x개) * 101% = 정리 가격 * (현재 개수 + x개)
                                     chasing_amount = (data['entry'] * (1 + self.chasing_target_profit) - clearing_price) * data['amount'] / (clearing_price - candle_now['close'] * (1 + self.chasing_target_profit))
                                     # print('    Chasing Entry %.4f Amount %.4f Now %.4f Clear %.4f Chasing amount %.4f' % (data['entry'], data['amount'], candle_now['close'], clearing_price, chasing_amount))
-                                    if chasing_amount * candle_now['close'] > self.balance['total'] * self.chasing_maximum_total_per * self.info.leverage:
-                                        chasing_amount = self.balance['total'] * self.chasing_maximum_total_per / candle_now['close']
+                                    if chasing_amount * candle_now['close'] > self.balance['total'] * self.chasing_maximum_total_per * data['input'] * self.info.leverage:
+                                        chasing_amount = self.balance['total'] * self.chasing_maximum_total_per * data['input'] / candle_now['close']
                                         # print('    Chasing amount modified %.4f' % chasing_amount)
                                         data['chasing_amount'] = chasing_amount if chasing_amount > 0 else 0
                                         data['chasing_remain'] = 3 if chasing_amount > 0 else 0
 
                             # 손절각일 경우 손절
-                            if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per:
+                            if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per * data['input']:
                                 gain_usdt = data['amount'] * price * self.stop_loss_amount_per / self.info.leverage
                                 pnl = self.sellOrder(data, data['amount'] * self.stop_loss_amount_per, price)
 
@@ -682,14 +683,14 @@ class Bot(metaclass=ABCMeta):
                                     # (평단가 * 현재 개수 + 지금 가격 * x개) * 99% = 정리 가격 * (현재 개수 + x개)
                                     chasing_amount = (clearing_price - data['entry'] * (1 - self.chasing_target_profit)) * data['amount'] / (candle_now['close'] * (1 - self.chasing_target_profit) - clearing_price)
                                     # print('    Chasing Entry %.4f Amount %.4f Now %.4f Clear %.4f Chasing amount %.4f' % (data['entry'], data['amount'], candle_now['close'], clearing_price, chasing_amount))
-                                    if chasing_amount * candle_now['close'] > self.balance['total'] * self.chasing_maximum_total_per * self.info.leverage:
-                                        chasing_amount = self.balance['total'] * self.chasing_maximum_total_per / candle_now['close']
+                                    if chasing_amount * candle_now['close'] > self.balance['total'] * self.chasing_maximum_total_per * data['input'] * self.info.leverage:
+                                        chasing_amount = self.balance['total'] * self.chasing_maximum_total_per * data['input'] / candle_now['close']
                                         # print('    Chasing amount modified %.4f' % chasing_amount)
                                         data['chasing_amount'] = chasing_amount if chasing_amount > 0 else 0
                                         data['chasing_remain'] = 3 if chasing_amount > 0 else 0
 
                             # 손절각일 경우 손절
-                            if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per:
+                            if data['using'] > self.balance['total'] * self.stop_loss_threshold_total_per * data['input']:
                                 using_usdt = data['amount'] * price * self.stop_loss_amount_per / self.info.leverage
                                 pnl = self.buyOrder(data, data['amount'] * self.stop_loss_amount_per, price)
 
@@ -701,7 +702,7 @@ class Bot(metaclass=ABCMeta):
 
                 # 진입 체크
                 if data['position'] is None and data['enabled']:
-                    using_usdt = self.balance['total'] * self.entry_amount_per
+                    using_usdt = self.balance['total'] * self.entry_amount_per * data['input']
 
                     fever_long = data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h']
                     long_entry_blocked = not data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l']

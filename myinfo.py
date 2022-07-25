@@ -16,6 +16,7 @@ class MyInfo:
     exchange_str = 'binance'
     title = ''
     password = ''
+    input = {}
 
     def __init__(self, config_file_name, chains):
         with open(config_file_name) as json_file:
@@ -27,6 +28,7 @@ class MyInfo:
             self.exchange_str = json_data["exchange"]
             self.title = json_data['title']
             self.password = json_data['password'] if 'password' in json_data else ''
+            self.input = json_data['input']
 
         if self.exchange_str == 'bitget':
             self.exchange = ccxt.bitget({
@@ -47,12 +49,13 @@ class MyInfo:
                     'defaultType': 'future'
                 }
             })
-
+            '''
             for symbol in chains:
                 self.exchange.fapiPrivate_post_leverage({
                     'symbol': symbol,
                     'leverage': self.leverage,
                 })
+            '''
 
         self.exchange.load_markets()
 
