@@ -44,13 +44,6 @@ class Bot(metaclass=ABCMeta):
             "fever_mode": True
         },
         {
-            "symbol": "ETCUSDT",
-            "amount_min": 0.001,
-            "sl_interval": "2h",
-            "interval": "30m",
-            "fever_mode": False
-        },
-        {
             "symbol": "LTCUSDT",
             "amount_min": 0.01,
             "sl_interval": "4h",
