@@ -27,21 +27,21 @@ class Bot(metaclass=ABCMeta):
             "amount_min": 0.1,
             "sl_interval": "8h",
             "interval": "30m",
-            "fever_mode": True
+            "fever_mode": False
         },
         {
             "symbol": "ETHUSDT",
             "amount_min": 0.01,
             "sl_interval": "6h",
             "interval": "30m",
-            "fever_mode": True
+            "fever_mode": False
         },
         {
             "symbol": "BCHUSDT",
             "amount_min": 0.01,
             "sl_interval": "8h",
             "interval": "30m",
-            "fever_mode": True
+            "fever_mode": False
         },
         {
             "symbol": "LTCUSDT",
@@ -698,9 +698,9 @@ class Bot(metaclass=ABCMeta):
                     using_usdt = self.balance['total'] * self.entry_amount_per * data['input']
 
                     fever_long = data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h']
-                    long_entry_blocked = not data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l']
                     fever_short = data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l']
-                    short_entry_blocked = not data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h']
+                    long_entry_blocked = fever_short or (not data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l'])
+                    short_entry_blocked = fever_long or (not data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h'])
                     if fever_long or (not long_entry_blocked and candle_now['close'] < candle_now['bb_l']):
                         reason = '(Fever)' if fever_long else ''
                         price = candle_now['close'] + data['amount_min']
