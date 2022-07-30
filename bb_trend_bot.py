@@ -384,7 +384,7 @@ class Bot(metaclass=ABCMeta):
                     continue
 
                 data['df_interval'] = self.book.generate_chart_data(data['symbol'], data['interval'], int(simulate / self.simulate_const[data['interval']]['simulate_candle_div']) + 125)
-                data['df_trend_interval'] = self.book.generate_chart_data(data['symbol'], data['trend_interval'], int(simulate * self.simulate_const[data['interval']]['sl_mul'] / self.simulate_const[data['trend_interval']]['sl_div']) + 100)
+                data['df_trend_interval'] = self.book.generate_chart_data(data['symbol'], data['trend_interval'], int(simulate * self.simulate_const[data['interval']]['sl_mul'] / self.simulate_const[data['trend_interval']]['sl_div']) + 125)
 
         candle_count = 0
         while not self.is_simulate or candle_count < simulate:
@@ -429,6 +429,7 @@ class Bot(metaclass=ABCMeta):
 
                     print("- Log [%s]" % data['symbol'])
                     print('    candle %s' % candle_now)
+                    print('    candle trend rsi %.4f' % candle_trend['rsi'])
 
                 if data['position'] is not None:
 
