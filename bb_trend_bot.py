@@ -322,11 +322,6 @@ class Bot(metaclass=ABCMeta):
         if self.is_simulate:
             return
 
-        for data in self.positions_data:
-            if data['chasing_amount'] > 0 and data['chasing_remain'] > 0:
-                time.sleep(600)
-                return
-
         # 15분에 맞게 대기
         minute = datetime.datetime.now().minute
         second = datetime.datetime.now().second
