@@ -137,39 +137,11 @@ class Bot(metaclass=ABCMeta):
             data['position'] = 'Long'
             data['amount'] = amount
         else:
-            if data['tp_price'] != 0:
-                self.notifyTPClose(data)
-
             data['position'] = None
             data['amount'] = 0
         data['using'] = float(record['positionInitialMargin'])
         data['entry'] = float(record['entryPrice'])
         data['pnl'] = float(record['unrealizedProfit'])
-
-    def notifyTPClose(self, data):
-        if self.is_simulate:
-            return
-
-        now = datetime.datetime.now() - datetime.timedelta(minutes=30)
-        date = now.strftime("%Y-%m-%d %H:%M:00")
-
-        if data['position'] == 'Long':
-            used_usdt = data['amount'] * data['entry'] / self.info.leverage
-            gain_usdt = data['amount'] * data['tp_price'] / self.info.leverage
-            pnl = (gain_usdt - used_usdt) * self.info.leverage
-
-            print('%s [%s] Long Close (TP/SL) - Size (%.4f USDT)' % (date, data['symbol'], gain_usdt))
-            print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-            self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Long 종료 (T/P)', 'Size (%.4f USDT -> %.4f USDT)' % (used_usdt, gain_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-
-        elif data['position'] == 'Short':
-            gained_usdt = data['amount'] * data['entry'] / self.info.leverage
-            using_usdt = data['amount'] * data['tp_price'] / self.info.leverage
-            pnl = (gained_usdt - using_usdt) * self.info.leverage
-
-            print('%s [%s] Short Close (TP/SL) - Size (%.4f USDT)' % (date, data['symbol'], using_usdt))
-            print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-            self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Short 종료 (T/P)', 'Size (%.4f USDT -> %.4f USDT)' % (gained_usdt, using_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
 
     def waitUntilOrderDone(self, order_id, symbol):
         if self.is_simulate:
@@ -196,15 +168,6 @@ class Bot(metaclass=ABCMeta):
             return
 
         self.info.cancelAllOpenOrder(symbol)
-
-    def checkSellOrderForSimulation(self, data, amount, price, date):
-        if self.is_simulate:
-            reason = 'T/P Close' if data['half'] else 'Limit'
-            gain_usdt = amount * price / self.info.leverage
-            pnl = self.sellOrder(data, amount, price)
-
-            print('%s [%s] Long %s - Size (%.4f USDT)' % (date, data['symbol'], reason, gain_usdt))
-            print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
 
     def makeSellOrder(self, data, amount, price):
         if not self.is_simulate:
@@ -282,15 +245,6 @@ class Bot(metaclass=ABCMeta):
             post_pnl = data['pnl']
 
             return self.floor(pre_pnl - post_pnl)
-
-    def checkBuyOrderForSimulation(self, data, amount, price, date):
-        if self.is_simulate:
-            reason = 'T/P Close' if data['half'] else 'Limit'
-            using_usdt = amount * price / self.info.leverage
-            pnl = self.buyOrder(data, amount, price)
-
-            print('%s [%s] Short %s - Size (%.4f USDT)' % (date, data['symbol'], reason, using_usdt))
-            print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
 
     def makeBuyOrder(self, data, amount, price):
         if not self.is_simulate:
