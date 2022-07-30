@@ -434,7 +434,7 @@ class Bot(metaclass=ABCMeta):
                         continue
 
                     df_interval = self.book.generate_chart_data(data['symbol'], data['interval'])
-                    df_trend = self.book.generate_chart_data(data['symbol'], data['trend_interval'], True)
+                    df_trend = self.book.generate_chart_data(data['symbol'], data['trend_interval'], 125, True)
 
                     candle_now = self.createCandle(df_interval.iloc[-1])
                     candle_trend = self.createCandle(df_trend.iloc[-1])
