@@ -375,8 +375,20 @@ class Bot(metaclass=ABCMeta):
             data['win'] = data['lose'] = data['profit'] = data['loss'] = data['commission'] = 0
             data['input'] = 1 if data['symbol'] not in self.info.input else self.info.input[data['symbol']]
             self.updatePositions(data)
+
+            # init stable setup
+            df_interval = self.book.generate_chart_data(data['symbol'], data['interval'], 135)
+
+            for i in range(self.bb_length_thres):
+                bb_bb_lp = df_interval.iloc[-1 - i]['bb_bb_lp']
+                bb_bbm_p = df_interval.iloc[-1 - i]['bb_bbm_p']
+                if bb_bb_lp <= bb_bbm_p:
+                    data['stable'] += 1
+                else:
+                    break
+
             if data['position'] is not None or data['enabled']:
-                print('    [%s] Position (%s), Size (%.4f USDT)' % (data['symbol'], data['position'], data['using']))
+                print('    [%s] Position (%s), Size (%.4f USDT), Stable Length (%d)' % (data['symbol'], data['position'], data['using'], data['stable']))
 
         if self.is_simulate:
             for data in self.positions_data:
@@ -574,5 +586,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(96*1)
 
