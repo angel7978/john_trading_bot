@@ -16,7 +16,7 @@ from abc import *
 class Bot(metaclass=ABCMeta):
     title = 'BB Bot'
     using_pnl_shortcut = True
-    simulation_usdt = 5000
+    simulation_usdt = 1000
     balance = {
         'total': 0.0,
         'free': 0.0
@@ -50,6 +50,13 @@ class Bot(metaclass=ABCMeta):
             "interval": "30m",
             "fever_mode": False
         },
+        {
+            "symbol": "ETCUSDT",
+            "amount_min": 0.001,
+            "sl_interval": "2h",
+            "interval": "30m",
+            "fever_mode": True
+        }
     ]
     simulate_const = {
         '15m': {
@@ -699,9 +706,9 @@ class Bot(metaclass=ABCMeta):
 
                     fever_long = data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h']
                     fever_short = data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l']
-                    long_entry_blocked = fever_short or (not data['fever_mode'] and candle_sl['low'] < candle_sl['bb_l'])
-                    short_entry_blocked = fever_long or (not data['fever_mode'] and candle_sl['high'] > candle_sl['bb_h'])
-                    if fever_long or (not long_entry_blocked and candle_now['close'] < candle_now['bb_l']):
+                    enter_long = candle_now['close'] < candle_now['bb_l'] and not fever_short and candle_sl['low'] >= candle_sl['bb_l']
+                    enter_short = candle_now['close'] > candle_now['bb_h'] and not fever_long and candle_sl['high'] <= candle_sl['bb_h']
+                    if fever_long or enter_long:
                         reason = '(Fever)' if fever_long else ''
                         price = candle_now['close'] + data['amount_min']
                         amount = using_usdt * self.info.leverage / price
@@ -709,7 +716,7 @@ class Bot(metaclass=ABCMeta):
 
                         print('%s [%s] Long Entry %s- Size (%.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt))
                         self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 진입 %s' % reason, 'Size (%.4f USDT / %.4f USDT)' % (using_usdt, self.balance['total']))
-                    elif fever_short or (not short_entry_blocked and candle_now['close'] > candle_now['bb_h']):
+                    elif fever_short or enter_short:
                         reason = '(Fever)' if fever_short else ''
                         price = candle_now['close'] - data['amount_min']
                         amount = using_usdt * self.info.leverage / price
@@ -780,5 +787,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(96*7)
 
