@@ -16,6 +16,7 @@ from abc import *
 
 class Bot(metaclass=ABCMeta):
     title = 'BB Bot (Trend)'
+    folder_name = 'summary'
     log_file_name = 'bb_trend_bot.log'
     using_pnl_shortcut = True
     simulation_usdt = 1000
@@ -117,12 +118,19 @@ class Bot(metaclass=ABCMeta):
         self.entry_amount_per = 0.1  # 진입시 사용되는 USDT
         self.bb_length_thres = 10
 
+        self.log_file_name = file_name + '.' + self.log_file_name
+
     def writeLog(self, data, pnl):
-        if not os.path.exists(self.log_file_name):
-            with open(self.log_file_name, 'w') as outfile:
+        file_path = self.folder_name + '/' + self.log_file_name
+
+        if not os.path.exists(self.folder_name):
+            os.mkdir(self.folder_name)
+
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as outfile:
                 json.dump({}, outfile)
 
-        with open(self.log_file_name) as json_file:
+        with open(file_path) as json_file:
             json_data = json.load(json_file)
 
             if data['symbol'] not in json_data:
@@ -139,7 +147,7 @@ class Bot(metaclass=ABCMeta):
                 record['lose'] += 1
             record['pnl'] += pnl
 
-        with open(self.log_file_name, 'w') as outfile:
+        with open(file_path, 'w') as outfile:
             json.dump(json_data, outfile, indent=4)
 
         total_tx = json_data[data['symbol']]['win'] + json_data[data['symbol']]['lose']
@@ -607,7 +615,7 @@ class Bot(metaclass=ABCMeta):
                     self.balance['total'] += data['pnl']
 
                 total_tx = data['win'] + data['lose']
-                print('[%s] Summery : Win rate (%d / %d, %.4f%%), Total profit (%.4f USDT), Avg profit (%.4f USDT), Total loss (%.4f USDT), Avg loss (%.4f USDT), Commission (%.4f USDT), Total PnL (%.4f USDT, %.4f%%)' % (data['symbol'], data['win'], total_tx, 0 if total_tx == 0 else (data['win'] * 100) / total_tx, data['profit'], 0 if data['win'] == 0 else data['profit'] / data['win'], data['loss'], 0 if data['lose'] == 0 else data['loss'] / data['lose'], data['commission'], data['profit'] + data['loss'], (data['profit'] + data['loss']) * 100 / self.simulation_usdt))
+                print('[%s] summary : Win rate (%d / %d, %.4f%%), Total profit (%.4f USDT), Avg profit (%.4f USDT), Total loss (%.4f USDT), Avg loss (%.4f USDT), Commission (%.4f USDT), Total PnL (%.4f USDT, %.4f%%)' % (data['symbol'], data['win'], total_tx, 0 if total_tx == 0 else (data['win'] * 100) / total_tx, data['profit'], 0 if data['win'] == 0 else data['profit'] / data['win'], data['loss'], 0 if data['lose'] == 0 else data['loss'] / data['lose'], data['commission'], data['profit'] + data['loss'], (data['profit'] + data['loss']) * 100 / self.simulation_usdt))
 
             print('Total (%.4f USDT), Total PnL (%.4f%%)' % (self.balance['total'], (self.balance['total'] - self.simulation_usdt) * 100 / self.simulation_usdt))
 
@@ -621,5 +629,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start(0)
+Bot(config_file_name).start()
 
