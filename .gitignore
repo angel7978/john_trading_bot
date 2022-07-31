@@ -4,3 +4,4 @@ venv
 config*.json
 /logs
 /tickers_backup
+*.log

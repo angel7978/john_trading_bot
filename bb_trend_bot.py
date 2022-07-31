@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os.path
 
 import telegram_module
 import math
@@ -15,6 +16,7 @@ from abc import *
 
 class Bot(metaclass=ABCMeta):
     title = 'BB Bot (Trend)'
+    log_file_name = 'bb_trend_bot.log'
     using_pnl_shortcut = True
     simulation_usdt = 1000
     balance = {
@@ -114,6 +116,36 @@ class Bot(metaclass=ABCMeta):
         self.taker_commission = 0.0004  # taker 수수료
         self.entry_amount_per = 0.1  # 진입시 사용되는 USDT
         self.bb_length_thres = 10
+
+    def writeLog(self, data, pnl):
+        if not os.path.exists(self.log_file_name):
+            with open(self.log_file_name, 'w') as outfile:
+                json.dump({}, outfile)
+
+        with open(self.log_file_name) as json_file:
+            json_data = json.load(json_file)
+
+            if data['symbol'] not in json_data:
+                json_data[data['symbol']] = {
+                    'win': 0,
+                    'lose': 0,
+                    'pnl': 0
+                }
+
+            record = json_data[data['symbol']]
+            if pnl > 0:
+                record['win'] += 1
+            else:
+                record['lose'] += 1
+            record['pnl'] += pnl
+
+        with open(self.log_file_name, 'w') as outfile:
+            json.dump(json_data, outfile, indent=4)
+
+        total_tx = json_data[data['symbol']]['win'] + json_data[data['symbol']]['lose']
+        win_rate = 'Win rate (%d / %d, %.2f%%' % (json_data[data['symbol']]['win'], total_tx, 0 if total_tx == 0 else (json_data[data['symbol']]['win'] * 100 / total_tx))
+        total_pnl = 'Total PnL (%.4f USDT)' % json_data[data['symbol']]['pnl']
+        return win_rate, total_pnl
 
     def updateBalance(self):
         if self.is_simulate:
@@ -439,9 +471,8 @@ class Bot(metaclass=ABCMeta):
                     candle_now = self.createCandle(df_interval.iloc[-1])
                     candle_trend = self.createCandle(df_trend.iloc[-1])
 
-                    print("- Log [%s]" % data['symbol'])
+                    print("- Log [%s] Rsi (%.4f)" % (data['symbol'], candle_trend['rsi']))
                     print('    candle %s' % candle_now)
-                    print('    candle trend rsi %.4f' % candle_trend['rsi'])
 
                 if data['position'] is not None:
 
@@ -467,7 +498,8 @@ class Bot(metaclass=ABCMeta):
 
                             print('%s [%s] Long Close %s - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], reason, gain_usdt))
                             print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 손절', 'Size (%.4f USDT)' % gain_usdt, 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
+                            win_rate, total_pnl = self.writeLog(data, pnl)
+                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 손절', 'Size (%.4f USDT)' % gain_usdt, 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
 
                             data['stable'] = 0
                             data['triggered'] = False
@@ -484,7 +516,8 @@ class Bot(metaclass=ABCMeta):
 
                                 print('%s [%s] Long Close - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], used_usdt, gain_usdt))
                                 print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 종료 %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (used_usdt, gain_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
+                                win_rate, total_pnl = self.writeLog(data, pnl)
+                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long 종료 %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (used_usdt, gain_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
 
                                 data['stable'] = self.bb_length_thres
                                 data['triggered'] = False
@@ -502,7 +535,8 @@ class Bot(metaclass=ABCMeta):
 
                             print('%s [%s] Short Close %s - Size (%.4f USDT)' % (candle_now['date'], data['symbol'], reason, using_usdt))
                             print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 손절', 'Size (%.4f USDT)' % using_usdt, 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
+                            win_rate, total_pnl = self.writeLog(data, pnl)
+                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 손절', 'Size (%.4f USDT)' % using_usdt, 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
 
                             data['stable'] = 0
                             data['triggered'] = False
@@ -519,7 +553,8 @@ class Bot(metaclass=ABCMeta):
 
                                 print('%s [%s] Short Close - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], gained_usdt, using_usdt))
                                 print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 종료 %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (gained_usdt, using_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
+                                win_rate, total_pnl = self.writeLog(data, pnl)
+                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short 종료 %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (gained_usdt, using_usdt), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
 
                                 data['stable'] = self.bb_length_thres
                                 data['triggered'] = False
@@ -572,7 +607,7 @@ class Bot(metaclass=ABCMeta):
                     self.balance['total'] += data['pnl']
 
                 total_tx = data['win'] + data['lose']
-                print('[%s] Summery : Win rate (%d / %d, %.4f%%), Total profit (%.4f USDT), Avg profit (%.4f USDT), Total loss (%.4f USDT), Avg loss (%.4f USDT), Commission (%.4f USDT), Total PnL (%.4f USDT, %.4f%%)' % (data['symbol'], data['win'], total_tx, (data['win'] * 100) / total_tx, data['profit'], 0 if data['win'] == 0 else data['profit'] / data['win'], data['loss'], 0 if data['lose'] == 0 else data['loss'] / data['lose'], data['commission'], data['profit'] + data['loss'], (data['profit'] + data['loss']) * 100 / self.simulation_usdt))
+                print('[%s] Summery : Win rate (%d / %d, %.4f%%), Total profit (%.4f USDT), Avg profit (%.4f USDT), Total loss (%.4f USDT), Avg loss (%.4f USDT), Commission (%.4f USDT), Total PnL (%.4f USDT, %.4f%%)' % (data['symbol'], data['win'], total_tx, 0 if total_tx == 0 else (data['win'] * 100) / total_tx, data['profit'], 0 if data['win'] == 0 else data['profit'] / data['win'], data['loss'], 0 if data['lose'] == 0 else data['loss'] / data['lose'], data['commission'], data['profit'] + data['loss'], (data['profit'] + data['loss']) * 100 / self.simulation_usdt))
 
             print('Total (%.4f USDT), Total PnL (%.4f%%)' % (self.balance['total'], (self.balance['total'] - self.simulation_usdt) * 100 / self.simulation_usdt))
 
@@ -586,5 +621,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(0)
 
