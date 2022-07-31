@@ -111,7 +111,7 @@ class OrderBook:
         df['datetime'] = df['datetime'] + 32400000
 
         df = dropna(df)
-        indicator_bb = BollingerBands(close=df["close"], window=20, window_dev=2)
+        indicator_bb = BollingerBands(close=df["close"], window=20, window_dev=3)
 
         # Add Bollinger Bands features
         df['bb_bbm'] = indicator_bb.bollinger_mavg()

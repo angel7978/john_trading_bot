@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+import time
 
 import requests
 import threading
 import json
+import telegram
+from telegram.ext import Updater
+from telegram.ext import CommandHandler
 
 
 class Telegram:
@@ -11,9 +15,19 @@ class Telegram:
             json_data = json.load(json_file)
             self.token = json_data['token']
             self.id = json_data['telegram_id']
+            self.bot = telegram.Bot(self.token)
+            '''
+            self.updater = Updater(token=self.token, use_context=True)
+            self.dispatcher = self.updater.dispatcher
+            
+            self.start_handler = CommandHandler('start', self.start)
+            self.dispatcher.add_handler(self.start_handler)
+            
+            self.updater.start_polling()
+            '''
 
-    def post(self, con):
-        requests.post(con)
+    def start(self, update, context):
+        context.bot.send_message(chat_id=update.effective_chat.id, text="아이앰더봇")
 
     def sendTelegramPush(self, *msgs):
         if self.token == '' or self.id == '':
@@ -23,10 +37,4 @@ class Telegram:
         for i in range(len(msgs)):
             msg += str(msgs[i]) + '\n'
 
-        contents = 'https://api.telegram.org/bot%s/sendmessage?chat_id=%s&text=%s' % (self.token, self.id, msg)
-
-        t = threading.Thread(target=self.post, args=(contents,))
-        t.daemon = True
-        t.start()
-
-        return t
+        self.bot.sendMessage(self.id, msg)

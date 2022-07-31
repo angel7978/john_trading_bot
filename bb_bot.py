@@ -467,7 +467,7 @@ class Bot(metaclass=ABCMeta):
         self.updateBalance()
 
         print('Bot start!, Free (%.4f USDT), Total (%.4f USDT)' % (self.balance['free'], self.balance['total']))
-        self.sendTelegramPush(self.title, 'Bot start!', 'Free (%.4f USDT), Total (%.4f USDT)' % (self.balance['free'], self.balance['total']))
+        self.sendTelegramPush(self.title, 'Bot 시작!', 'Free (%.4f USDT), Total (%.4f USDT)' % (self.balance['free'], self.balance['total']))
 
         for data in self.positions_data:
             data['position'] = None
@@ -787,5 +787,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start(96*7)
+Bot(config_file_name).start()
 
