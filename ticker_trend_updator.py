@@ -413,5 +413,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-TickerUpdator(config_file_name).start(48 * 30)
+TickerUpdator(config_file_name).start(48 * 365)
 
