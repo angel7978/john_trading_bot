@@ -445,7 +445,7 @@ class Bot(metaclass=ABCMeta):
             self.updateBalance()
 
             for data in self.positions_data:
-                if data['position'] is None and not data['enabled']:
+                if not data['enabled']:
                     continue
 
                 self.updatePositions(data)
