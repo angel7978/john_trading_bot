@@ -14,6 +14,9 @@ class OrderBook:
     exchange = None
 
     simulate_const = {
+        '1m': {
+            'candle_thres': 60000
+        },
         '15m': {
             'candle_thres': 900000
         },
