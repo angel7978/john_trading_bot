@@ -577,32 +577,24 @@ class Bot(metaclass=ABCMeta):
                     bb_length = candle_now['bb_h'] - candle_now['bb_l']
                     if data['position'] == 'Long':
                         # 물타기
-                        if candle_now['close'] > data['entry'] - bb_length * 0.5:
-                            self.makeBuyOrder(data, data['amount'] / 3, data['entry'] - bb_length * 0.5)
-                        if candle_now['close'] > data['entry'] - bb_length:
-                            self.makeBuyOrder(data, data['amount'] / 3, data['entry'] - bb_length)
-                        if candle_now['close'] > data['entry'] - bb_length * 1.5:
-                            self.makeBuyOrder(data, data['amount'] / 3, data['entry'] - bb_length * 1.5)
+                        if candle_now['close'] > data['entry'] * 0.95:
+                            self.makeBuyOrder(data, data['amount'] / 5, data['entry'] * 0.97)
+                        if candle_now['close'] > data['entry'] * 0.91:
+                            self.makeBuyOrder(data, data['amount'], data['entry'] * 0.91)
 
                         # 익절
-                        if data['corner_price'] < candle_now['bb_l'] + bb_length * 0.8:
-                            self.makeSellOrder(data, data['amount'] * 0.2, candle_now['bb_h'] - bb_length * 0.2)
-                        if data['corner_price'] < candle_now['bb_l'] + bb_length:
-                            self.makeSellOrder(data, data['amount'] * 0.4, candle_now['bb_h'])
+                        self.makeSellOrder(data, data['amount'] * 0.5, data['entry'] * 1.05)
+                        self.makeSellOrder(data, data['amount'] * 0.5, data['entry'] * 1.1)
                     else:
                         # 물타기
-                        if candle_now['close'] < data['entry'] + bb_length * 0.5:
-                            self.makeSellOrder(data, data['amount'] / 3, data['entry'] + bb_length * 0.5)
-                        if candle_now['close'] < data['entry'] + bb_length:
-                            self.makeSellOrder(data, data['amount'] / 3, data['entry'] + bb_length)
-                        if candle_now['close'] < data['entry'] + bb_length * 1.5:
-                            self.makeSellOrder(data, data['amount'] / 3, data['entry'] + bb_length * 1.5)
+                        if candle_now['close'] < data['entry'] * 1.05:
+                            self.makeSellOrder(data, data['amount'] / 5, data['entry'] * 1.05)
+                        if candle_now['close'] < data['entry'] * 1.09:
+                            self.makeSellOrder(data, data['amount'], data['entry'] * 1.09)
 
                         # 익절
-                        if data['corner_price'] > candle_now['bb_h'] - bb_length * 0.8:
-                            self.makeBuyOrder(data, data['amount'] * 0.2, candle_now['bb_l'] + bb_length * 0.2)
-                        if data['corner_price'] > candle_now['bb_h'] - bb_length:
-                            self.makeBuyOrder(data, data['amount'] * 0.4, candle_now['bb_l'])
+                        self.makeBuyOrder(data, data['amount'] * 0.5, data['entry'] * 0.95)
+                        self.makeBuyOrder(data, data['amount'] * 0.5, data['entry'] * 0.9)
 
                 # print('    %s %s \n %s' % (candle_now['date'], self.simulation_order, data['entry']))
                 if not self.is_simulate:
