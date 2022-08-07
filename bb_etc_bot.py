@@ -121,7 +121,7 @@ class Bot(metaclass=ABCMeta):
         data['entry'] = float(record['entryPrice'])
         data['pnl'] = float(record['unrealizedProfit'])
 
-        if check_limit:
+        if check_limit and data['amount'] != pre_amount:
             now = datetime.datetime.now() - datetime.timedelta(minutes=1)
             date = now.strftime("%Y-%m-%d %H:%M:00")
 
