@@ -404,6 +404,7 @@ class Bot(metaclass=ABCMeta):
             'bb_h': record['bb_bbh'],
             'bb_m': record['bb_bbm'],
             'bb_l': record['bb_bbl'],
+            'bb_vh2': record['bb_vh']
         }
 
     def sendTelegramPush(self, *msgs):
@@ -526,7 +527,7 @@ class Bot(metaclass=ABCMeta):
                 long_entry = candle_now['open'] > candle_now['close'] and candle_now['bb_l'] > candle_now['close']
                 short_entry = candle_now['open'] < candle_now['close'] and candle_now['bb_h'] < candle_now['close']
                 if long_entry:
-                    if data['volume'] < candle_now['volume']:
+                    if candle_now['bb_vh2'] > candle_now['volume'] > data['volume']:
                         reason = 'Triggered' if data['volume'] == 0 else 'Updated'
                         data['volume'] = candle_now['volume']
                         data['datetime'] = candle_now['datetime']
@@ -557,7 +558,7 @@ class Bot(metaclass=ABCMeta):
                             data['volume'] = data['datetime'] = 0
                             data['last_chasing_time'] = candle_now['datetime']
                 elif short_entry:
-                    if data['volume'] < candle_now['volume']:
+                    if candle_now['bb_vh2'] > candle_now['volume'] > data['volume']:
                         reason = 'Triggered' if data['volume'] == 0 else 'Updated'
                         data['volume'] = candle_now['volume']
                         data['datetime'] = candle_now['datetime']
@@ -629,5 +630,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(60*24*7)
 
