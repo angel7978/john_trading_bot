@@ -28,6 +28,7 @@ class Bot(metaclass=ABCMeta):
         {
             "symbol": "ETCUSDT",
             "amount_min": 0.001,
+            "min_order_amount": 0.14,
             "interval": '1m'
         }
     ]
@@ -83,7 +84,7 @@ class Bot(metaclass=ABCMeta):
             json.dump(json_data, outfile, indent=4)
 
         total_tx = json_data[data['symbol']]['win'] + json_data[data['symbol']]['lose']
-        win_rate = 'Win rate (%d / %d, %.2f%%' % (json_data[data['symbol']]['win'], total_tx, 0 if total_tx == 0 else (json_data[data['symbol']]['win'] * 100 / total_tx))
+        win_rate = 'Win rate (%d / %d, %.2f%%)' % (json_data[data['symbol']]['win'], total_tx, 0 if total_tx == 0 else (json_data[data['symbol']]['win'] * 100 / total_tx))
         total_pnl = 'Total PnL (%.4f USDT)' % json_data[data['symbol']]['pnl']
         return win_rate, total_pnl
 
@@ -134,7 +135,7 @@ class Bot(metaclass=ABCMeta):
                     print('%s [%s] Long Partial Close (Limit) - Size (%.4f USDT -> %.4f USDT)' % (date, data['symbol'], pre_using, data['using']))
                     print('    Estimated PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
                     win_rate, total_pnl = self.writeLog(data, pnl)
-                    self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Long 일부 종료', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), '추정 PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
+                    self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Long 일부 종료', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), '추정 PnL (%.4f USDT)' % pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
 
             if pre_position == data['position'] == 'Short':
                 if data['amount'] > pre_amount:
@@ -145,7 +146,7 @@ class Bot(metaclass=ABCMeta):
                     print('%s [%s] Short Partial Close (Limit) - Size (%.4f USDT -> %.4f USDT)' % (date, data['symbol'], pre_using, data['using']))
                     print('    Estimated PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
                     win_rate, total_pnl = self.writeLog(data, pnl)
-                    self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Short 일부 종료', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), '추정 PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
+                    self.sendTelegramPush(self.title, '%s [%s]' % (date, data['symbol']), 'Short 일부 종료', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), '추정 PnL (%.4f USDT)' % pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
 
     def waitUntilOrderDone(self, order_id, symbol):
         if self.is_simulate:
@@ -473,13 +474,13 @@ class Bot(metaclass=ABCMeta):
                         high_price = candle_now['close'] >= candle_now['bb_h']
                         low_amount = data['amount'] < min_amount
                         sl_trigger = data['using'] > self.balance['total'] * 0.5
-                        close_amount = data['amount'] if low_amount or data['amount'] <= min_amount * 2 else data['amount'] * 0.5
+                        close_amount = data['amount'] if low_amount or data['amount'] <= min_amount * 2 or data['amount'] * 0.5 < data['min_order_amount'] else data['amount'] * 0.5
 
                         if sl_trigger or high_price or low_amount:
                             reason = 'Partial Close (BB)'
                             if sl_trigger:
                                 reason = 'S/L (Too much using)'
-                            elif low_amount:
+                            elif close_amount == data['amount']:
                                 reason = 'Close (Low amount)'
 
                             pre_using = data['using']
@@ -488,7 +489,7 @@ class Bot(metaclass=ABCMeta):
                             print('%s [%s] Long %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
                             print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
                             win_rate, total_pnl = self.writeLog(data, pnl)
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
+                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
                     else:
                         if data['corner_price'] > candle_now['low']:
                             data['corner_price'] = candle_now['low']
@@ -502,13 +503,13 @@ class Bot(metaclass=ABCMeta):
                         low_price = candle_now['close'] <= candle_now['bb_l']
                         low_amount = data['amount'] < min_amount
                         sl_trigger = data['using'] > self.balance['total'] * 0.5
-                        close_amount = data['amount'] if low_amount or data['amount'] <= min_amount * 2 else data['amount'] * 0.5
+                        close_amount = data['amount'] if low_amount or data['amount'] <= min_amount * 2 or data['amount'] * 0.5 < data['min_order_amount'] else data['amount'] * 0.5
 
                         if sl_trigger or low_price or low_amount:
                             reason = 'Partial Close (BB)'
                             if sl_trigger:
                                 reason = 'S/L (Too much using)'
-                            elif low_amount:
+                            elif close_amount == data['amount']:
                                 reason = 'Close (Low amount)'
 
                             pre_using = data['using']
@@ -517,7 +518,7 @@ class Bot(metaclass=ABCMeta):
                             print('%s [%s] Short %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
                             print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
                             win_rate, total_pnl = self.writeLog(data, pnl)
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
+                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
 
                 self.cancelAllOpenOrder(data['symbol'])
 
@@ -542,10 +543,10 @@ class Bot(metaclass=ABCMeta):
                             print('%s [%s] Short %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
                             print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
                             win_rate, total_pnl = self.writeLog(data, pnl)
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
+                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
 
                         if data['position'] is None or data['last_chasing_time'] + 1800000 < candle_now['datetime']:
-                            reason = 'Entry' if data['position'] is None else 'Chasing'
+                            reason = 'Open' if data['position'] is None else 'Chasing'
                             price = candle_now['close'] + data['amount_min']
                             amount = using_usdt * self.info.leverage / price
                             pre_using = data['using']
@@ -573,10 +574,10 @@ class Bot(metaclass=ABCMeta):
                             print('%s [%s] Long %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
                             print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
                             win_rate, total_pnl = self.writeLog(data, pnl)
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']), win_rate, total_pnl)
+                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
 
                         if data['position'] is None or data['last_chasing_time'] + 1800000 < candle_now['datetime']:
-                            reason = 'Entry' if data['position'] is None else 'Chasing'
+                            reason = 'Open' if data['position'] is None else 'Chasing'
                             price = candle_now['close'] - data['amount_min']
                             amount = using_usdt * self.info.leverage / price
                             pre_using = data['using']
