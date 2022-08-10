@@ -29,9 +29,13 @@ class Bot(metaclass=ABCMeta):
             "symbol": "ETCUSDT",
             "amount_min": 0.001,
             "min_order_amount": 0.14,
-            "interval": '1m'
+            "interval": '1m',
+            "blocked": None
         }
     ]
+    df_data = {
+        "ETCUSDT": None
+    }
     simulation_order = {
         "buy_order": [],
         "sell_order": []
@@ -190,7 +194,7 @@ class Bot(metaclass=ABCMeta):
 
     @staticmethod
     def resetData(data):
-        data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['volume'] = data['datetime'] = data['corner_price'] = data['last_chasing_time'] = 0
+        data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['volume'] = data['datetime'] = data['last_chasing_time'] = 0
 
     def sellOrder(self, data, amount, price):
         if self.is_simulate:
@@ -434,7 +438,7 @@ class Bot(metaclass=ABCMeta):
 
         if self.is_simulate:
             for data in self.positions_data:
-                data['df_interval'] = self.book.generate_chart_data(data['symbol'], data['interval'], simulate + 110)
+                self.df_data[data['symbol']] = self.book.load_chart_data(data['symbol'], data['interval'], simulate)
 
         candle_count = 0
         while not self.is_simulate or candle_count < simulate:
@@ -449,7 +453,7 @@ class Bot(metaclass=ABCMeta):
                     candle_idx = -simulate + candle_count
                     if candle_idx >= 0:
                         continue
-                    candle_now = self.createCandle(data['df_interval'].iloc[candle_idx])
+                    candle_now = self.createCandle(self.df_data[data['symbol']].iloc[candle_idx])
                 else:
                     df_interval = self.book.generate_chart_data(data['symbol'], data['interval'])
 
@@ -460,11 +464,19 @@ class Bot(metaclass=ABCMeta):
 
                 self.checkSimulationOrder(data, candle_now)
 
+                if data['blocked'] is None:
+                    if candle_now['rsi'] >= 75:
+                        data['blocked'] = 'Short'
+                        print('%s [%s] Short blocked, (Rsi %.4f)' % (candle_now['date'], data['symbol'], candle_now['rsi']))
+                    elif candle_now['rsi'] <= 25:
+                        data['blocked'] = 'Long'
+                        print('%s [%s] Long blocked, (Rsi %.4f)' % (candle_now['date'], data['symbol'], candle_now['rsi']))
+                elif (data['blocked'] == 'Short' and candle_now['rsi'] <= 55) or (data['blocked'] == 'Long' and candle_now['rsi'] >= 45):
+                    data['blocked'] = None
+                    print('%s [%s] Release blocked, (Rsi %.4f)' % (candle_now['date'], data['symbol'], candle_now['rsi']))
+
                 if data['position'] is not None:
                     if data['position'] == 'Long':
-                        if data['corner_price'] < candle_now['high']:
-                            data['corner_price'] = candle_now['high']
-
                         price = candle_now['close'] + data['amount_min']
                         min_amount = self.balance['total'] * self.entry_amount_per * data['input'] * self.info.leverage / price * 0.25
                         if self.is_simulate:
@@ -473,13 +485,16 @@ class Bot(metaclass=ABCMeta):
                         # 종료
                         high_price = candle_now['close'] >= candle_now['bb_h']
                         low_amount = data['amount'] < min_amount
-                        sl_trigger = data['using'] > self.balance['total'] * 0.5
-                        close_amount = data['amount'] if low_amount or data['amount'] <= min_amount * 2 or data['amount'] * 0.5 < data['min_order_amount'] else data['amount'] * 0.5
+                        sl_trigger_1 = data['using'] > self.balance['total'] * 0.5
+                        sl_trigger_2 = data['blocked'] == 'Long'
+                        close_amount = data['amount'] if low_amount or sl_trigger_2 or data['amount'] <= min_amount * 2 or data['amount'] * 0.5 < data['min_order_amount'] else data['amount'] * 0.5
 
-                        if sl_trigger or high_price or low_amount:
+                        if sl_trigger_1 or sl_trigger_2 or high_price or low_amount:
                             reason = 'Partial Close (BB)'
-                            if sl_trigger:
+                            if sl_trigger_1:
                                 reason = 'S/L (Too much using)'
+                            elif sl_trigger_2:
+                                reason = 'S/L (RSI is too low)'
                             elif close_amount == data['amount']:
                                 reason = 'Close (Low amount)'
 
@@ -491,9 +506,6 @@ class Bot(metaclass=ABCMeta):
                             win_rate, total_pnl = self.writeLog(data, pnl)
                             self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
                     else:
-                        if data['corner_price'] > candle_now['low']:
-                            data['corner_price'] = candle_now['low']
-
                         price = candle_now['close'] - data['amount_min']
                         min_amount = self.balance['total'] * self.entry_amount_per * data['input'] * self.info.leverage / price * 0.25
                         if self.is_simulate:
@@ -502,13 +514,16 @@ class Bot(metaclass=ABCMeta):
                         # 종료
                         low_price = candle_now['close'] <= candle_now['bb_l']
                         low_amount = data['amount'] < min_amount
-                        sl_trigger = data['using'] > self.balance['total'] * 0.5
-                        close_amount = data['amount'] if low_amount or data['amount'] <= min_amount * 2 or data['amount'] * 0.5 < data['min_order_amount'] else data['amount'] * 0.5
+                        sl_trigger_1 = data['using'] > self.balance['total'] * 0.5
+                        sl_trigger_2 = data['blocked'] == 'Short'
+                        close_amount = data['amount'] if low_amount or sl_trigger_2 or data['amount'] <= min_amount * 2 or data['amount'] * 0.5 < data['min_order_amount'] else data['amount'] * 0.5
 
-                        if sl_trigger or low_price or low_amount:
+                        if sl_trigger_1 or sl_trigger_2 or low_price or low_amount:
                             reason = 'Partial Close (BB)'
-                            if sl_trigger:
+                            if sl_trigger_1:
                                 reason = 'S/L (Too much using)'
+                            elif sl_trigger_2:
+                                reason = 'S/L (RSI is too high)'
                             elif close_amount == data['amount']:
                                 reason = 'Close (Low amount)'
 
@@ -525,8 +540,8 @@ class Bot(metaclass=ABCMeta):
                 # 진입 체크
                 using_usdt = self.balance['total'] * self.entry_amount_per * data['input']
 
-                long_entry = candle_now['open'] > candle_now['close'] and candle_now['bb_l'] > candle_now['close']
-                short_entry = candle_now['open'] < candle_now['close'] and candle_now['bb_h'] < candle_now['close']
+                long_entry = candle_now['open'] > candle_now['close'] and candle_now['bb_l'] > candle_now['close'] and data['blocked'] != 'Long'
+                short_entry = candle_now['open'] < candle_now['close'] and candle_now['bb_h'] < candle_now['close'] and data['blocked'] != 'Short'
                 if long_entry:
                     if candle_now['bb_vh2'] > candle_now['volume'] > data['volume']:
                         reason = 'Triggered' if data['volume'] == 0 else 'Updated'
@@ -555,7 +570,6 @@ class Bot(metaclass=ABCMeta):
                             print('%s [%s] Long %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
                             self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
 
-                            data['corner_price'] = price
                             data['volume'] = data['datetime'] = 0
                             data['last_chasing_time'] = candle_now['datetime']
                 elif short_entry:
@@ -586,7 +600,6 @@ class Bot(metaclass=ABCMeta):
                             print('%s [%s] Short %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
                             self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
 
-                            data['corner_price'] = price
                             data['volume'] = data['datetime'] = 0
                             data['last_chasing_time'] = candle_now['datetime']
 
