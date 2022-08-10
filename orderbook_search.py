@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 
 import ccxt
 import time
@@ -12,6 +13,8 @@ import numpy as np
 
 class OrderBook:
     exchange = None
+    folder_name = 'data'
+    data_file_name = 'data.csv'
 
     simulate_const = {
         '1m': {
@@ -76,6 +79,35 @@ class OrderBook:
         df = pd.DataFrame(data=btc, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
         return df.iloc[-1]['close']
 
+    def load_chart_data(self, symbol, timeframe):
+        file_path = self.folder_name + '/' + symbol + '_' + timeframe + '_' + self.data_file_name
+
+        if not os.path.exists(self.folder_name):
+            os.mkdir(self.folder_name)
+
+        if not os.path.exists(file_path):
+            df = self.generate_chart_data(symbol, timeframe, 48*365)
+        else:
+            df = pd.read_csv(file_path)
+            latest_df = self.generate_chart_data(symbol, timeframe)
+
+            df = pd.concat([df, latest_df.loc[df.iloc[-1]['datetime'] < latest_df['datetime']]])
+        df.to_csv(file_path, index=False)
+        return df
+
+    def update_chart_data(self, symbol, timeframe, df):
+        latest_df = self.generate_chart_data(symbol, timeframe)
+        df = pd.concat([df, latest_df.loc[df.iloc[-1]['datetime'] < latest_df['datetime']]])
+        return df
+
+    def save_chart_data(self, symbol, timeframe, df):
+        file_path = self.folder_name + '/' + symbol + '_' + timeframe + '_' + self.data_file_name
+
+        if not os.path.exists(self.folder_name):
+            os.mkdir(self.folder_name)
+
+        df.to_csv(file_path, index=False)
+
     def generate_chart_data(self, symbol, timeframe='30m', limit=110, includeLatest=False):
         df = pd.DataFrame(data=None, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
 
@@ -121,7 +153,7 @@ class OrderBook:
         df['bb_bbh'] = indicator_bb.bollinger_hband()
         df['bb_bbl'] = indicator_bb.bollinger_lband()
 
-        volume_bb = BollingerBands(close=df["volume"], window=100, window_dev=2)
+        volume_bb = BollingerBands(close=df["volume"], window=100, window_dev=1)
 
         # Add Bollinger Bands features
         df['bb_vm'] = volume_bb.bollinger_mavg()
