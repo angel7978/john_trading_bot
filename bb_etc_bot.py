@@ -54,6 +54,7 @@ class Bot(metaclass=ABCMeta):
 
         self.taker_commission = 0.0004  # taker 수수료
         self.entry_amount_per = 0.1  # 진입시 사용되는 USDT
+        self.partial_close_amount_rate = 0.3
 
         self.log_file_name = file_name + '.' + self.log_file_name
 
@@ -483,13 +484,14 @@ class Bot(metaclass=ABCMeta):
                             data['pnl'] = (price - data['entry']) * data['amount']
 
                         # 종료
+                        long_close_pending = data['blocked'] == 'Short'
                         high_price = candle_now['close'] >= candle_now['bb_h']
                         low_amount = data['amount'] < min_amount
                         sl_trigger_1 = data['using'] > self.balance['total'] * 0.5
                         sl_trigger_2 = data['blocked'] == 'Long'
-                        close_amount = data['amount'] if low_amount or sl_trigger_2 or data['amount'] <= min_amount * 2 or data['amount'] * 0.5 < data['min_order_amount'] else data['amount'] * 0.5
+                        close_amount = data['amount'] if low_amount or sl_trigger_2 or data['amount'] <= min_amount or data['amount'] * self.partial_close_amount_rate < data['min_order_amount'] else data['amount'] * self.partial_close_amount_rate
 
-                        if sl_trigger_1 or sl_trigger_2 or high_price or low_amount:
+                        if not long_close_pending and (sl_trigger_1 or sl_trigger_2 or high_price or low_amount):
                             reason = 'Partial Close (BB)'
                             if sl_trigger_1:
                                 reason = 'S/L (Too much using)'
@@ -512,13 +514,14 @@ class Bot(metaclass=ABCMeta):
                             data['pnl'] = (data['entry'] - price) * data['amount']
 
                         # 종료
+                        short_close_pending = data['blocked'] == 'Long'
                         low_price = candle_now['close'] <= candle_now['bb_l']
                         low_amount = data['amount'] < min_amount
                         sl_trigger_1 = data['using'] > self.balance['total'] * 0.5
                         sl_trigger_2 = data['blocked'] == 'Short'
-                        close_amount = data['amount'] if low_amount or sl_trigger_2 or data['amount'] <= min_amount * 2 or data['amount'] * 0.5 < data['min_order_amount'] else data['amount'] * 0.5
+                        close_amount = data['amount'] if low_amount or sl_trigger_2 or data['amount'] <= min_amount or data['amount'] * self.partial_close_amount_rate < data['min_order_amount'] else data['amount'] * self.partial_close_amount_rate
 
-                        if sl_trigger_1 or sl_trigger_2 or low_price or low_amount:
+                        if not short_close_pending and (sl_trigger_1 or sl_trigger_2 or low_price or low_amount):
                             reason = 'Partial Close (BB)'
                             if sl_trigger_1:
                                 reason = 'S/L (Too much using)'

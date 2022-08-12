@@ -89,7 +89,9 @@ class OrderBook:
             df = self.generate_chart_data(symbol, timeframe, init_load_count)
         else:
             df = pd.read_csv(file_path)
-            latest_df = self.generate_chart_data(symbol, timeframe)
+            last_date_time = df.iloc[-1]['datetime']
+            load_count = int((round(time.time() * 1000) + 32400000 - last_date_time) / 60000) + 110
+            latest_df = self.generate_chart_data(symbol, timeframe, load_count)
 
             df = pd.concat([df, latest_df.loc[df.iloc[-1]['datetime'] < latest_df['datetime']]])
         df.to_csv(file_path, index=False)
