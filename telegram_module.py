@@ -37,4 +37,9 @@ class Telegram:
         for i in range(len(msgs)):
             msg += str(msgs[i]) + '\n'
 
+        t = threading.Thread(target=self.run, args=(msg,))
+        t.daemon = True
+        t.start()
+
+    def run(self, msg):
         self.bot.sendMessage(self.id, msg)

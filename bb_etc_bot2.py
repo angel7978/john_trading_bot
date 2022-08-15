@@ -15,7 +15,7 @@ from abc import *
 
 
 class Bot(metaclass=ABCMeta):
-    title = 'BB Bot (ETC)'
+    title = 'BB Bot v2 (ETC)'
     folder_name = 'summary'
     log_file_name = 'bb_etc_bot.log'
     using_pnl_shortcut = True
@@ -29,9 +29,7 @@ class Bot(metaclass=ABCMeta):
             "symbol": "ETCUSDT",
             "amount_min": 0.001,
             "min_order_amount": 0.14,
-            "interval": '1m',
-            "real_pnl": 0,
-            "blocked": None
+            "interval": '1m'
         }
     ]
     df_data = {
@@ -54,23 +52,11 @@ class Bot(metaclass=ABCMeta):
         self.title = self.info.title
 
         self.taker_commission = 0.0004  # taker 수수료
-        self.entry_amount_per = 0.1  # 진입시 사용되는 USDT
-        self.min_amount_rate = 0.25
-        self.partial_close_amount_rate = 0.3
+        self.entry_amount_per = 0.01  # 진입시 사용되는 USDT
 
         self.log_file_name = file_name + '.' + self.log_file_name
 
     def writeLog(self, data, pnl):
-        if self.is_simulate:
-            if pnl > 0:
-                data['win'] += 1
-                data['profit'] += pnl
-            else:
-                data['lose'] += 1
-                data['loss'] += pnl
-
-            return "", ""
-
         file_path = self.folder_name + '/' + self.log_file_name
 
         if not os.path.exists(self.folder_name):
@@ -207,7 +193,7 @@ class Bot(metaclass=ABCMeta):
 
     @staticmethod
     def resetData(data):
-        data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['volume'] = data['datetime'] = data['last_chasing_time'] = 0
+        data['amount'] = data['using'] = data['entry'] = data['pnl'] = data['volume'] = data['last_time'] = data['long_risk'] = data['short_risk'] = 0
 
     def sellOrder(self, data, amount, price):
         if self.is_simulate:
@@ -236,8 +222,14 @@ class Bot(metaclass=ABCMeta):
                 if data['amount'] == amount:  # close
                     data['position'] = None
                     self.resetData(data)
+                elif data['amount'] < amount:  # position change
+                    gain_usdt_leverage = price * data['amount']
+                    used_usdt_leverage = data['entry'] * data['amount']
 
-                    pnl = gain_usdt_leverage - used_usdt_leverage
+                    data['position'] = 'Short'
+                    data['amount'] = amount - data['amount']
+                    data['entry'] = price
+                    data['using'] = data['amount'] * price / self.info.leverage
                 else:  # limit or s/l
                     gain_usdt_leverage = price * amount
                     used_usdt_leverage = data['entry'] * amount
@@ -245,7 +237,14 @@ class Bot(metaclass=ABCMeta):
                     data['using'] -= amount * data['entry'] / self.info.leverage
                     data['amount'] -= amount
 
-                    pnl = gain_usdt_leverage - used_usdt_leverage
+                pnl = gain_usdt_leverage - used_usdt_leverage
+                if pnl > 0:
+                    data['win'] += 1
+                    data['profit'] += pnl
+                else:
+                    data['lose'] += 1
+                    data['loss'] += pnl
+
             self.balance['total'] += pnl
             return pnl
         else:
@@ -302,7 +301,14 @@ class Bot(metaclass=ABCMeta):
                     data['position'] = None
                     self.resetData(data)
 
-                    pnl = gained_usdt_leverage - using_usdt_leverage
+                elif data['amount'] < amount:  # position change
+                    using_usdt_leverage = price * data['amount']
+                    gained_usdt_leverage = data['entry'] * data['amount']
+
+                    data['position'] = 'Long'
+                    data['amount'] = amount - data['amount']
+                    data['entry'] = price
+                    data['using'] = data['amount'] * price / self.info.leverage
                 else:  # limit or s/l
                     using_usdt_leverage = price * amount
                     gained_usdt_leverage = data['entry'] * amount
@@ -310,7 +316,14 @@ class Bot(metaclass=ABCMeta):
                     data['using'] -= amount * data['entry'] / self.info.leverage
                     data['amount'] -= amount
 
-                    pnl = gained_usdt_leverage - using_usdt_leverage
+                pnl = gained_usdt_leverage - using_usdt_leverage
+                if pnl > 0:
+                    data['win'] += 1
+                    data['profit'] += pnl
+                else:
+                    data['lose'] += 1
+                    data['loss'] += pnl
+
             self.balance['total'] += pnl
             return pnl
         else:
@@ -350,7 +363,7 @@ class Bot(metaclass=ABCMeta):
 
                     print('%s [%s] Long Partial Close (Limit) - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], pre_using, data['using']))
                     print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-                    data['real_pnl'] += pnl
+                    win_rate, total_pnl = self.writeLog(data, pnl)
                 else:
                     self.sellOrder(data, order['amount'], order['price'])
 
@@ -370,7 +383,7 @@ class Bot(metaclass=ABCMeta):
 
                     print('%s [%s] Short Partial Close (Limit) - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], pre_using, data['using']))
                     print('    PnL (%.4f USDT), Total (%.4f USDT)' % (pnl, self.balance['total']))
-                    data['real_pnl'] += pnl
+                    win_rate, total_pnl = self.writeLog(data, pnl)
                 else:
                     self.buyOrder(data, order['amount'], order['price'])
 
@@ -425,7 +438,7 @@ class Bot(metaclass=ABCMeta):
 
         if self.is_simulate:
             for data in self.positions_data:
-                self.df_data[data['symbol']] = self.book.add_indicator(self.book.load_chart_data(data['symbol'], data['interval'], simulate))
+                self.df_data[data['symbol']] = self.book.load_chart_data(data['symbol'], data['interval'], simulate)
 
         candle_count = 0
         while not self.is_simulate or candle_count < simulate:
@@ -442,7 +455,7 @@ class Bot(metaclass=ABCMeta):
                         continue
                     candle_now = self.createCandle(self.df_data[data['symbol']].iloc[candle_idx])
                 else:
-                    df_interval = self.book.add_indicator(self.book.generate_chart_data(data['symbol'], data['interval']))
+                    df_interval = self.book.generate_chart_data(data['symbol'], data['interval'])
 
                     candle_now = self.createCandle(df_interval.iloc[-1])
 
@@ -450,177 +463,74 @@ class Bot(metaclass=ABCMeta):
                     print('    candle %s' % candle_now)
 
                 self.checkSimulationOrder(data, candle_now)
-
-                if data['blocked'] is None:
-                    if candle_now['rsi'] >= 75:
-                        data['blocked'] = 'Short'
-                        print('%s [%s] Short blocked, (Rsi %.4f)' % (candle_now['date'], data['symbol'], candle_now['rsi']))
-                    elif candle_now['rsi'] <= 25:
-                        data['blocked'] = 'Long'
-                        print('%s [%s] Long blocked, (Rsi %.4f)' % (candle_now['date'], data['symbol'], candle_now['rsi']))
-                elif (data['blocked'] == 'Short' and candle_now['rsi'] <= 55) or (data['blocked'] == 'Long' and candle_now['rsi'] >= 45):
-                    data['blocked'] = None
-                    print('%s [%s] Release blocked, (Rsi %.4f)' % (candle_now['date'], data['symbol'], candle_now['rsi']))
-
-                if data['position'] is not None:
-                    real_pnl = 0
-
-                    if data['position'] == 'Long':
-                        price = candle_now['close'] + data['amount_min']
-                        min_amount = self.balance['total'] * self.entry_amount_per * data['input'] * self.info.leverage * self.min_amount_rate / price
-                        if self.is_simulate:
-                            data['pnl'] = (price - data['entry']) * data['amount']
-
-                        # 종료
-                        long_close_pending = data['blocked'] == 'Short'
-                        high_price = candle_now['close'] >= candle_now['bb_h']
-                        low_amount = data['amount'] < min_amount
-                        sl_trigger_amount = data['using'] > self.balance['total'] * 0.5
-                        sl_trigger_rsi = data['blocked'] == 'Long'
-                        close_amount = data['amount'] if low_amount or sl_trigger_rsi or data['amount'] <= min_amount or data['amount'] * self.partial_close_amount_rate < data['min_order_amount'] else data['amount'] * self.partial_close_amount_rate
-
-                        if not long_close_pending and (sl_trigger_amount or sl_trigger_rsi or high_price or low_amount):
-                            pre_using = data['using']
-                            pnl = self.sellOrder(data, close_amount, price)
-                            data['real_pnl'] += pnl
-
-                            reason = 'Partial Close (BB)'
-                            real_pnl = 0
-                            if sl_trigger_amount:
-                                reason = 'S/L (Too much using)'
-                            elif sl_trigger_rsi:
-                                reason = 'S/L (low RSI)'
-                            elif close_amount == data['amount']:
-                                reason = 'Close (Low amount)'
-                                real_pnl = data['real_pnl']
-                                data['real_pnl'] = 0
-
-                            print('%s [%s] Long %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
-                            if real_pnl != 0:
-                                print('    PnL (%.4f USDT), Total (%.4f USDT)' % (real_pnl, self.balance['total']))
-
-                                win_rate, total_pnl = self.writeLog(data, real_pnl)
-                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long Close', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % real_pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
-                    else:
-                        price = candle_now['close'] - data['amount_min']
-                        min_amount = self.balance['total'] * self.entry_amount_per * data['input'] * self.info.leverage * self.min_amount_rate / price
-                        if self.is_simulate:
-                            data['pnl'] = (data['entry'] - price) * data['amount']
-
-                        # 종료
-                        short_close_pending = data['blocked'] == 'Long'
-                        low_price = candle_now['close'] <= candle_now['bb_l']
-                        low_amount = data['amount'] < min_amount
-                        sl_trigger_amount = data['using'] > self.balance['total'] * 0.5
-                        sl_trigger_rsi = data['blocked'] == 'Short'
-                        close_amount = data['amount'] if low_amount or sl_trigger_rsi or data['amount'] <= min_amount or data['amount'] * self.partial_close_amount_rate < data['min_order_amount'] else data['amount'] * self.partial_close_amount_rate
-
-                        if not short_close_pending and (sl_trigger_amount or sl_trigger_rsi or low_price or low_amount):
-                            pre_using = data['using']
-                            pnl = self.buyOrder(data, close_amount, price)
-                            data['real_pnl'] += pnl
-
-                            reason = 'Partial Close (BB)'
-                            if sl_trigger_amount:
-                                reason = 'S/L (Too much using)'
-                            elif sl_trigger_rsi:
-                                reason = 'S/L (high RSI)'
-                            elif close_amount == data['amount']:
-                                reason = 'Close (Low amount)'
-                                real_pnl = data['real_pnl']
-                                data['real_pnl'] = 0
-
-                            print('%s [%s] Short %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
-                            if real_pnl != 0:
-                                print('    PnL (%.4f USDT), Total (%.4f USDT)' % (real_pnl, self.balance['total']))
-                                win_rate, total_pnl = self.writeLog(data, real_pnl)
-                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short Close', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % real_pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
-
                 self.cancelAllOpenOrder(data['symbol'])
 
-                # 진입 체크
-                using_usdt = self.balance['total'] * self.entry_amount_per * data['input']
-
-                long_entry = candle_now['open'] > candle_now['close'] and candle_now['bb_l'] > candle_now['close'] and data['blocked'] != 'Long'
-                short_entry = candle_now['open'] < candle_now['close'] and candle_now['bb_h'] < candle_now['close'] and data['blocked'] != 'Short'
-                if long_entry:
-                    if candle_now['bb_vh2'] > candle_now['volume'] > data['volume']:
-                        reason = 'Triggered' if data['volume'] == 0 else 'Updated'
-                        data['volume'] = candle_now['volume']
-                        data['datetime'] = candle_now['datetime']
-                        # print('%s [%s] Long Entry %s, Volume : (%.4f)' % (candle_now['date'], data['symbol'], reason, data['volume']))
-                    else:
-                        if data['position'] == 'Short':
-                            reason = 'Close (Position Change)'
-                            price = candle_now['close'] - data['amount_min']
-                            pre_using = data['using']
-                            pnl = self.buyOrder(data, data['amount'], price)
-                            real_pnl = data['real_pnl'] + pnl
-                            data['real_pnl'] = 0
-
-                            print('%s [%s] Short %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
-                            print('    PnL (%.4f USDT), Total (%.4f USDT)' % (real_pnl, self.balance['total']))
-                            win_rate, total_pnl = self.writeLog(data, real_pnl)
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short Close', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % real_pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
-
-                        if data['position'] is None or data['last_chasing_time'] + 1800000 < candle_now['datetime']:
-                            reason = 'Open' if data['position'] is None else 'Chasing'
-                            price = candle_now['close'] + data['amount_min']
-                            amount = using_usdt * self.info.leverage / price
-                            pre_using = data['using']
-                            self.buyOrder(data, amount, price)
-
-                            print('%s [%s] Long %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
-
-                            data['volume'] = data['datetime'] = 0
-                            data['last_chasing_time'] = candle_now['datetime']
-                elif short_entry:
-                    if candle_now['bb_vh2'] > candle_now['volume'] > data['volume']:
-                        reason = 'Triggered' if data['volume'] == 0 else 'Updated'
-                        data['volume'] = candle_now['volume']
-                        data['datetime'] = candle_now['datetime']
-                        # print('%s [%s] Short Entry %s, Volume : (%.4f)' % (candle_now['date'], data['symbol'], reason, data['volume']))
-                    else:
-                        if data['position'] == 'Long':
-                            reason = 'Close (Position Change)'
-                            price = candle_now['close'] + data['amount_min']
-                            pre_using = data['using']
-                            pnl = self.sellOrder(data, data['amount'], price)
-                            real_pnl = data['real_pnl'] + pnl
-                            data['real_pnl'] = 0
-
-                            print('%s [%s] Long %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
-                            print('    PnL (%.4f USDT), Total (%.4f USDT)' % (real_pnl, self.balance['total']))
-                            win_rate, total_pnl = self.writeLog(data, real_pnl)
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long Close', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % real_pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
-
-                        if data['position'] is None or data['last_chasing_time'] + 1800000 < candle_now['datetime']:
-                            reason = 'Open' if data['position'] is None else 'Chasing'
-                            price = candle_now['close'] - data['amount_min']
-                            amount = using_usdt * self.info.leverage / price
-                            pre_using = data['using']
-                            self.sellOrder(data, amount, price)
-
-                            print('%s [%s] Short %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
-
-                            data['volume'] = data['datetime'] = 0
-                            data['last_chasing_time'] = candle_now['datetime']
-
-                if data['datetime'] != 0 and data['datetime'] < candle_now['datetime'] - 300000:
-                    data['volume'] = data['datetime'] = 0
-                    # print('%s [%s] Entry Reset' % (candle_now['date'], data['symbol']))
-
                 if data['position'] is not None:
                     if data['position'] == 'Long':
                         # 물타기
-                        if candle_now['close'] > data['entry'] * 0.91:
-                            self.makeBuyOrder(data, data['amount'], data['entry'] * 0.91)
+                        #if candle_now['low'] < data['entry'] * 0.9:
+                        #    print('BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! ')
+                        risk = (candle_now['low'] - data['entry']) * 100 * self.info.leverage / data['entry']
+                        if data['long_risk'] > risk:
+                            data['long_risk'] = risk
                     else:
                         # 물타기
-                        if candle_now['close'] < data['entry'] * 1.09:
-                            self.makeSellOrder(data, data['amount'], data['entry'] * 1.09)
+                        #if candle_now['high'] > data['entry'] * 1.1:
+                        #    print('BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! BOOM !!! ')
+                        risk = (data['entry'] - candle_now['high']) * 100 * self.info.leverage / data['entry']
+                        if data['short_risk'] > risk:
+                            data['short_risk'] = risk
+
+                # 진입 체크
+                using_usdt = self.balance['total'] * self.entry_amount_per * data['input'] * (2 if data['position'] is None else 1)
+
+                buy_signal = candle_now['open'] > candle_now['close'] and candle_now['bb_l'] > candle_now['close'] and data['last_time'] + 300000 < candle_now['datetime']
+                #if buy_signal and data['position'] == 'Short' and candle_now['close'] > data['entry']:
+                #    buy_signal = False
+                sell_signal = candle_now['open'] < candle_now['close'] and candle_now['bb_h'] < candle_now['close'] and data['last_time'] + 300000 < candle_now['datetime']
+                #if sell_signal and data['position'] == 'Long' and candle_now['close'] < data['entry']:
+                #    sell_signal = False
+
+                if data['position'] == 'Long':
+                    pnl = (candle_now['close'] - data['entry']) * data['amount']
+                    roe = (candle_now['close'] - data['entry']) * 100 / data['entry']
+                elif data['position'] == 'Short':
+                    pnl = (data['entry'] - candle_now['close']) * data['amount']
+                    roe = (data['entry'] - candle_now['close']) * 100 / data['entry']
+                else:
+                    pnl = 0
+                    roe = 0
+
+                if buy_signal:
+                    price = candle_now['close'] + data['amount_min']
+                    amount = using_usdt * self.info.leverage / price
+                    if data['position'] == 'Short' and amount < data['amount'] * 0.25:
+                        amount = data['amount'] * 0.25
+                    pre_using = data['using']
+                    buy_pnl = self.buyOrder(data, amount, price)
+
+                    print('%s [%s] Buy - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], pre_using, data['using']))
+                    if buy_pnl != 0:
+                        print('    PnL (%.4f USDT), Total (%.4f USDT)' % (buy_pnl, self.balance['total']))
+                    print('    Position %s - Entry (%.4f USDT), Close (%.4f USDT), ROE(%.2f %%), PnL(%.4f USDT)' % (data['position'], data['entry'], candle_now['close'], roe, pnl))
+                    self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Buy', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
+
+                    data['last_time'] = candle_now['datetime']
+                elif sell_signal:
+                    price = candle_now['close'] - data['amount_min']
+                    amount = using_usdt * self.info.leverage / price
+                    if data['position'] == 'Long' and amount < data['amount'] * 0.25:
+                        amount = data['amount'] * 0.25
+                    pre_using = data['using']
+                    sell_pnl = self.sellOrder(data, amount, price)
+
+                    print('%s [%s] Sell - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], pre_using, data['using']))
+                    if sell_pnl != 0:
+                        print('    PnL (%.4f USDT), Total (%.4f USDT)' % (sell_pnl, self.balance['total']))
+                    print('    Position %s - Entry (%.4f USDT), Close (%.4f USDT), ROE(%.2f %%), PnL(%.4f USDT)' % (data['position'], data['entry'], candle_now['close'], roe, pnl))
+                    self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Sell', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
+
+                    data['last_time'] = candle_now['datetime']
 
                 # print('    %s %s \n %s' % (candle_now['date'], self.simulation_order, data['entry']))
                 if not self.is_simulate:
@@ -636,6 +546,7 @@ class Bot(metaclass=ABCMeta):
 
                 total_tx = data['win'] + data['lose']
                 print('[%s] summary : Win rate (%d / %d, %.4f%%), Total profit (%.4f USDT), Avg profit (%.4f USDT), Total loss (%.4f USDT), Avg loss (%.4f USDT), Commission (%.4f USDT), Total PnL (%.4f USDT, %.4f%%)' % (data['symbol'], data['win'], total_tx, 0 if total_tx == 0 else (data['win'] * 100) / total_tx, data['profit'], 0 if data['win'] == 0 else data['profit'] / data['win'], data['loss'], 0 if data['lose'] == 0 else data['loss'] / data['lose'], data['commission'], data['profit'] + data['loss'], (data['profit'] + data['loss']) * 100 / self.simulation_usdt))
+                print('Max risk Long (%.2f %%), Short (%.2f %%)' % (data['long_risk'], data['short_risk']))
 
             print('Total (%.4f USDT), Total PnL (%.4f%%)' % (self.balance['total'], (self.balance['total'] - self.simulation_usdt) * 100 / self.simulation_usdt))
 
@@ -649,5 +560,5 @@ if len(sys.argv) <= 1:
 else:
     config_file_name = sys.argv[1]
 
-Bot(config_file_name).start()
+Bot(config_file_name).start(60*24*30)
 

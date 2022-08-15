@@ -86,7 +86,7 @@ class OrderBook:
             os.mkdir(self.folder_name)
 
         if not os.path.exists(file_path):
-            df = self.generate_chart_data(symbol, timeframe, init_load_count)
+            df = self.generate_chart_data(symbol, timeframe, init_load_count + 1)
         else:
             df = pd.read_csv(file_path)
             last_date_time = df.iloc[-1]['datetime']
@@ -94,7 +94,28 @@ class OrderBook:
             latest_df = self.generate_chart_data(symbol, timeframe, load_count)
 
             df = pd.concat([df, latest_df.loc[df.iloc[-1]['datetime'] < latest_df['datetime']]])
-        df.to_csv(file_path, index=False)
+        df.loc[:, 'datetime': 'date'].to_csv(file_path, index=False)
+
+        return df
+
+    @staticmethod
+    def add_indicator(df):
+        df = dropna(df)
+        indicator_bb = BollingerBands(close=df["close"], window=20, window_dev=2)
+
+        # Add Bollinger Bands features
+        df['bb_bbm'] = indicator_bb.bollinger_mavg()
+        df['bb_bbh'] = indicator_bb.bollinger_hband()
+        df['bb_bbl'] = indicator_bb.bollinger_lband()
+
+        volume_bb = BollingerBands(close=df["volume"], window=100, window_dev=2)
+
+        # Add Bollinger Bands features
+        df['bb_vh'] = volume_bb.bollinger_hband()
+
+        indicator_rsi = RSIIndicator(close=df["close"], window=14)
+        df['rsi'] = indicator_rsi.rsi()
+
         return df
 
     def update_chart_data(self, symbol, timeframe, df):
@@ -108,7 +129,7 @@ class OrderBook:
         if not os.path.exists(self.folder_name):
             os.mkdir(self.folder_name)
 
-        df.to_csv(file_path, index=False)
+        df.loc[:, 'datetime': 'date'].to_csv(file_path, index=False)
 
     def generate_chart_data(self, symbol, timeframe='30m', limit=110, includeLatest=False):
         df = pd.DataFrame(data=None, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
@@ -146,24 +167,6 @@ class OrderBook:
         if timeframe != '1d':
             df['date'] = pd.DatetimeIndex(df['date']) + timedelta(hours=9)
         df['datetime'] = df['datetime'] + 32400000
-
-        df = dropna(df)
-        indicator_bb = BollingerBands(close=df["close"], window=20, window_dev=2)
-
-        # Add Bollinger Bands features
-        df['bb_bbm'] = indicator_bb.bollinger_mavg()
-        df['bb_bbh'] = indicator_bb.bollinger_hband()
-        df['bb_bbl'] = indicator_bb.bollinger_lband()
-
-        volume_bb = BollingerBands(close=df["volume"], window=100, window_dev=2)
-
-        # Add Bollinger Bands features
-        df['bb_vm'] = volume_bb.bollinger_mavg()
-        df['bb_vh'] = volume_bb.bollinger_hband()
-        df['bb_vl'] = volume_bb.bollinger_lband()
-
-        indicator_rsi = RSIIndicator(close=df["close"], window=14)
-        df['rsi'] = indicator_rsi.rsi()
 
         '''
         pd.set_option('display.max_columns', None)
