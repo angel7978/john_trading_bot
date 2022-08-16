@@ -485,7 +485,6 @@ class Bot(metaclass=ABCMeta):
                             data['real_pnl'] += pnl
 
                             reason = 'Partial Close (BB)'
-                            real_pnl = 0
                             if sl_trigger_amount:
                                 reason = 'S/L (Too much using)'
                             elif sl_trigger_rsi:
@@ -533,6 +532,7 @@ class Bot(metaclass=ABCMeta):
                             print('%s [%s] Short %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
                             if real_pnl != 0:
                                 print('    PnL (%.4f USDT), Total (%.4f USDT)' % (real_pnl, self.balance['total']))
+
                                 win_rate, total_pnl = self.writeLog(data, real_pnl)
                                 self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short Close', 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']), 'PnL (%.4f USDT)' % real_pnl, total_pnl, win_rate, 'Wallet (%.4f USDT)' % self.balance['total'])
 
@@ -571,7 +571,8 @@ class Bot(metaclass=ABCMeta):
                             self.buyOrder(data, amount, price)
 
                             print('%s [%s] Long %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
+                            if reason == 'Open':
+                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Long %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
 
                             data['volume'] = data['datetime'] = 0
                             data['last_chasing_time'] = candle_now['datetime']
@@ -603,7 +604,8 @@ class Bot(metaclass=ABCMeta):
                             self.sellOrder(data, amount, price)
 
                             print('%s [%s] Short %s - Size (%.4f USDT -> %.4f USDT)' % (candle_now['date'], data['symbol'], reason, pre_using, data['using']))
-                            self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
+                            if reason == 'Open':
+                                self.sendTelegramPush(self.title, '%s [%s]' % (candle_now['date'], data['symbol']), 'Short %s' % reason, 'Size (%.4f USDT -> %.4f USDT)' % (pre_using, data['using']))
 
                             data['volume'] = data['datetime'] = 0
                             data['last_chasing_time'] = candle_now['datetime']
