@@ -56,7 +56,8 @@ class OrderBook:
             }})
         else:
             self.exchange = ccxt.binance({'options': {
-                'defaultType': 'future'
+                'defaultType': 'future',
+                'verbose': True
             }})
 
     def fetch_markets(self):
